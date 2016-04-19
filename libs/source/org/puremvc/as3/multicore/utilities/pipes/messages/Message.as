@@ -16,6 +16,7 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 	 * behavior of filter or queue fittings connected
 	 * to the pipleline into which they are written.</P>
 	 */ 
+	
 	public class Message implements IPipeMessage
 	{
 
@@ -29,20 +30,20 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 		/**
 		 * Normal Message type.
 		 */
-		protected static const BASE:String = 'http://puremvc.org/namespaces/pipes/messages/';
+		protected static const BASE:String = 'messages/';
 		public static const NORMAL:String = BASE+'normal/';
 		
 		// TBD: Messages in a queue can be sorted by priority.
-		protected var priority:int;
+		public var priority:int;
 
 		// Messages can be handled differently according to type
-		protected var type:String;
+		public var type:String;
 		
 		// Header properties describe any meta data about the message for the recipient
-		protected var header:Object;
+		public var header:Object;
 
 		// Body of the message is the precious cargo
-		protected var body:Object;
+		public var body:Object;
 
 		// Constructor
 		public function Message( type:String, header:Object=null, body:Object=null, priority:int=5 )

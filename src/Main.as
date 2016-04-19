@@ -1,10 +1,9 @@
 package
 {
-	import app.shell.MainFacade;
-	import flash.display.Shape;
+	import app.main.MainFacade;
+	import flash.display.Graphics;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.text.TextField;
 	
 	/**
 	 * ...
@@ -12,7 +11,7 @@ package
 	 */
 	public class Main extends Sprite 
 	{
-		
+		private var _back:Graphics;
 		public function Main() 
 		{
 			if (stage) init();
@@ -24,14 +23,18 @@ package
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
 			
-			var shape:Shape = new Shape()
-			shape.graphics.beginFill(0xf1f1f1);
-			shape.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
-			//while (count--) shape.graphics.drawCircle(Math.random() * stage.stageWidth, Math.random() * stage.stageHeight, (Math.random()*10 + 5));
-			shape.graphics.endFill();
-			this.addChild(shape);
+			_back = this.graphics;
+			this.changeColor(0xf1f1f1)
 			
 			MainFacade.getInstance(MainFacade.NAME).startup(this);
+		}
+		
+		//==================================================================================================	
+		public function changeColor(value:uint):void {
+		//==================================================================================================	
+			_back.beginFill(value);
+			_back.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
+			_back.endFill();
 		}
 		
 	}

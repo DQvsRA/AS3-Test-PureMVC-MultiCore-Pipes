@@ -36,7 +36,7 @@ package app.modules.logger.view
 			switch ( note.getName() ) 
 			{           
 				case LoggerModule.GET_LOG_UI:
-					trace("LoggerMediator > LoggerModule.GET_LOG_UI");
+					//trace("\n> LoggerMediator > LoggerModule.GET_LOG_UI");
 					sendNotification(LoggerFacade.EXPORT_LOG_UI, DisplayObject(this.viewComponent));
 					break;
 				case LoggerFacade.LOG_MSG:

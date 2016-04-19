@@ -8,10 +8,11 @@
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
-    <movie version="18" />
+    <movie version="16" />
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#FFFFFF" />
+    <movie preferredSDK="Flex 4.6.0, AIR 16.0;4.6.0, 16.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -53,7 +54,7 @@
   </includeLibraries>
   <!-- SWC Libraries -->
   <libraryPaths>
-    <!-- example: <element path="..." /> -->
+    <element path="libs\swc\as3swf.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>

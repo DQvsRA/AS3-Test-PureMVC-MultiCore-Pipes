@@ -5,7 +5,6 @@
  */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
-	import flash.utils.getQualifiedClassName;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 
@@ -20,7 +19,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	{
 		protected var output:IPipeFitting;
 
-		public function Pipe( output:IPipeFitting=null )
+		public function Pipe( output:IPipeFitting = null )
 		{
 			if (output) connect(output);
 		}
@@ -38,7 +37,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var success:Boolean = false;
 			if (this.output == null) {
 				this.output = output;
-				success=true;
+				success = true;
 			}
 			return success;
 		}
@@ -70,7 +69,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		public function write( message:IPipeMessage ) : Boolean
 		{
-			return output.write( message );
+			return output && output.write( message );
 		}
 		
 	}

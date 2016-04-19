@@ -4,7 +4,10 @@
 */
 package org.puremvc.as3.multicore.patterns.observer
 {
-	import org.puremvc.as3.multicore.interfaces.*;
+	import flash.utils.getQualifiedClassName;
+	
+	import org.puremvc.as3.multicore.interfaces.IFacade;
+	import org.puremvc.as3.multicore.interfaces.INotifier;
 	import org.puremvc.as3.multicore.patterns.facade.Facade;
 	
 	/**
@@ -88,7 +91,10 @@ package org.puremvc.as3.multicore.patterns.observer
 		// Return the Multiton Facade instance 
 		protected function get facade():IFacade
 		{
-			if ( multitonKey == null ) throw Error( MULTITON_MSG );
+			if ( multitonKey == null ){
+				trace(getQualifiedClassName(this));
+				throw Error( MULTITON_MSG );
+			}
 			return Facade.getInstance( multitonKey );
 		}
 		

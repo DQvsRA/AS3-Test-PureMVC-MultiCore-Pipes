@@ -1,22 +1,24 @@
-/*
- PureMVC AS3 MultiCore Demo – Flex PipeWorks 
- Copyright (c) 2008 Cliff Hall <cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package app.modules
 {
 	import app.common.PipeAwareModule;
-	import app.modules.circlemaker.CircleMakerFacade;
-	import app.shell.MainFacade;
+	import app.modules.circlebutton.CircleButtonFacade;
 
 	public class CircleMakerModule extends PipeAwareModule
 	{
-		static public const MESSAGE_TO_SHELL_CIRCLE_MAKER_BUTTON:String = "appendCircleButton";
+		static public const MESSAGE_TO_MAIN_CIRCLE_MAKER_BUTTON	: String = "appendCircleButton";
+		
+		static public const RECIEVE_CIRCLE_BUTTON_PARAMERTS		: String = "recieveCircleButtonParamets";
 		
 		public function CircleMakerModule()
 		{
-			super(CircleMakerFacade.getInstance( moduleID ));
-			CircleMakerFacade(facade).startup( this );
+			super(CircleButtonFacade.getInstance( moduleID ));
+			CircleButtonFacade(facade).startup( this );
+		}
+		
+		public function exportToMain():void
+		{
+			trace("> CircleMaker : Module.exportToMain");
+			facade.sendNotification(CircleButtonFacade.GET_CIRCLE_BUTTON);
 		}
 		
 		public function getID():String
@@ -24,22 +26,9 @@ package app.modules
 			return moduleID;
 		}
 		
-		public function exportToMain():void
-		{
-			trace("CircleMakerModule.exportToMain");
-			facade.sendNotification(CircleMakerFacade.GET_CIRCLE_BUTTON);
-		}
-		
-		/**
-		 * Get the next unique id.
-		 * <P>
-		 * This module can be instantiated multiple times, 
-		 * so each instance needs to have it's own unique
-		 * id for use as a multiton key.
-		 */
 		private static function getNextID():String
 		{
-			return CircleMakerFacade.NAME + '/' + serial++;
+			return CircleButtonFacade.NAME + '/' + serial++;
 		}
 		
 		private static var serial:Number = 0;

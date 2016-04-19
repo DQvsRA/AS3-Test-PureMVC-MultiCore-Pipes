@@ -100,7 +100,12 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var output:IPipeFitting;
 			while (l--) {
 				output = _outputs[l];
-				if (! output.write( message ) ) success = false;
+				if( !output ) {
+					delete _outputs[l];
+					output = null;
+					l++;
+				}
+				if (output && !output.write( message ) ) success = false;
 			}
 			return success;	
 		}

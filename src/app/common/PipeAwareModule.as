@@ -14,27 +14,46 @@ package app.common
 
 	public class PipeAwareModule extends ModuleBase implements IPipeAware
 	{
-		
 		/**
 		 * Standard output pipe name constant.
 		 */
-		public static const STDOUT:String 				= 'standardOutput';
+		public static const STDOUT:String 				= 'outputFromMainToAll';
 		
 		/**
 		 * Standard input pipe name constant.
 		 */
-		public static const STDIN:String 				= 'standardInput';
-		
-		/**
-		 * Standard log pipe name constant.
-		 */
-		public static const STDLOG:String 				= 'standardLog';
+		public static const STDIN:String 				= 'inputFromMain';
 		
 		/**
 		 * Standard shell pipe name constant.
 		 */
-		public static const STDSHELL:String 			= 'standardShell';
-
+		public static const STDMAIN:String 				= 'toMain';
+		
+		/**
+		 * Standard log pipe name constant.
+		 */
+		public static const STDLOG:String 				= 'toLog';
+		
+		/**
+		 * Worker output out.
+		 */
+		public static const TOWRK:String 				= 'toWorkerTee';
+		
+		/**
+		 * Worker output in.
+		 */
+		public static const FROMWRK:String 				= 'fromWorkerTee';
+		
+		/**
+		 * Worker input in.
+		 */
+		public static const WRKIN:String 				= 'workerIn';
+		
+		/**
+		 * Worker output out.
+		 */
+		public static const WRKOUT:String 				= 'workerOut';
+		
 		/**
 		 * Constructor.
 		 * <P>

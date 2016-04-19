@@ -1,7 +1,7 @@
 package app.modules.logger.controller 
 {
 	import app.modules.logger.view.components.LoggerView;
-	import app.modules.logger.view.LoggerJunction;
+	import app.modules.logger.LoggerJunction;
 	import app.modules.logger.view.LoggerMediator;
 	import org.puremvc.as3.multicore.interfaces.ICommand;
 	import org.puremvc.as3.multicore.interfaces.INotification;

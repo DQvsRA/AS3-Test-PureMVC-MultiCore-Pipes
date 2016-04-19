@@ -71,10 +71,10 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 						outputPipes.push(name);	
 						break;					
 					default:	
-						success=false;
+						success = false;
 				}
 			} else {
-				success=false;
+				success = false;
 			}
 			return success;
 		}
@@ -125,7 +125,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		{
 			if ( hasPipe(name) ) 
 			{
-				var type:String = pipeTypesMap[name];
+				const type:String = pipeTypesMap[name];
 				var pipesList:Array;
 				switch (type) {
 					case INPUT:
@@ -171,7 +171,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		public function addPipeListener( inputPipeName:String, context:Object, listener:Function ):Boolean 
 		{
 			var success:Boolean=false;
-			if ( hasInputPipe(inputPipeName) )
+			if ( hasPipe(inputPipeName) )
 			{
 				var pipe:IPipeFitting = pipesMap[inputPipeName] as IPipeFitting;
 				success = pipe.connect( new PipeListener(context, listener) );
@@ -188,11 +188,9 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		public function sendMessage( outputPipeName:String, message:IPipeMessage ):Boolean 
 		{
 			var success:Boolean = false;
-			var hasOutputPipe:Boolean = hasOutputPipe(outputPipeName);
-			if ( hasOutputPipe )
+			if ( hasOutputPipe(outputPipeName) )
 			{
-				var pipe:IPipeFitting = pipesMap[outputPipeName] as IPipeFitting;
-				trace(outputPipeName, JSON.stringify(message.getHeader()));
+				const pipe:IPipeFitting = pipesMap[outputPipeName] as IPipeFitting;
 				success = pipe.write(message);
 			} 
 			return success;

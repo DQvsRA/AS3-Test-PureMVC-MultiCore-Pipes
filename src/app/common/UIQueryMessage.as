@@ -1,8 +1,6 @@
 package app.common
 {
 	import flash.display.DisplayObject;
-	import flash.display.Sprite;
-	import mx.core.UIComponent;
 	
 	import org.puremvc.as3.multicore.utilities.pipes.messages.Message;
 
