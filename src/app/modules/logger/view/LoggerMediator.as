@@ -22,6 +22,11 @@ package app.modules.logger.view
 		{
 			super( NAME, viewComponent );
 		}
+		
+		override public function onRegister():void
+		{
+			
+		}
         
 		override public function listNotificationInterests():Array 
 		{
@@ -38,6 +43,9 @@ package app.modules.logger.view
 				case LoggerModule.GET_LOG_UI:
 					//trace("\n> LoggerMediator > LoggerModule.GET_LOG_UI");
 					sendNotification(LoggerFacade.EXPORT_LOG_UI, DisplayObject(this.viewComponent));
+					break;
+				case LoggerModule.SET_LOG_SIZE:
+					
 					break;
 				case LoggerFacade.LOG_MSG:
 					logger.addText((note.getBody() as LogMessage).message);

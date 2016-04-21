@@ -1,7 +1,7 @@
 package app.modules.logger.controller 
 {
 	import app.modules.logger.view.components.LoggerView;
-	import app.modules.logger.LoggerJunction;
+	import app.modules.logger.LoggerJunctionMediator;
 	import app.modules.logger.view.LoggerMediator;
 	import org.puremvc.as3.multicore.interfaces.ICommand;
 	import org.puremvc.as3.multicore.interfaces.INotification;
@@ -17,7 +17,7 @@ package app.modules.logger.controller
 		override public function execute(note:INotification):void {
 		//==================================================================================================	
 			facade.registerMediator(new LoggerMediator(new LoggerView()));
-			facade.registerMediator(new LoggerJunction());
+			facade.registerMediator(new LoggerJunctionMediator());
 		}
 	}
 }
