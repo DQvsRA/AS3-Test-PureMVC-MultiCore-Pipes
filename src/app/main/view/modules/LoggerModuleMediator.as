@@ -6,8 +6,9 @@
 package app.main.view.modules
 {
 	import app.common.PipeAwareModule;
-	import app.modules.LoggerModule;
 	import app.main.MainFacade;
+	import app.modules.LoggerModule;
+	
 	import org.puremvc.as3.multicore.interfaces.INotification;
 	import org.puremvc.as3.multicore.patterns.mediator.Mediator;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeAware;
@@ -36,7 +37,7 @@ package app.main.view.modules
 
 		override public function onRegister():void
 		{
-//			sendNotification( MainFacade.CONNECT_MODULE_TO_WORKER, logger );
+			facade.sendNotification( MainFacade.CONNECT_MODULE_TO_WORKER, logger );
 		}
 		
 		override public function listNotificationInterests():Array
@@ -56,6 +57,7 @@ package app.main.view.modules
 					
 					const pipe:Pipe = new Pipe();
 					const module:IPipeAware = note.getBody() as IPipeAware;
+					
 					module.acceptOutputPipe( PipeAwareModule.STDLOG, pipe );
 					logger.acceptInputPipe( PipeAwareModule.STDIN, pipe );
 					
@@ -63,17 +65,18 @@ package app.main.view.modules
 
 				// Bidirectionally connect shell and logger on STDLOG/STDSHELL
 				case  MainFacade.CONNECT_MAIN_TO_LOGGER:
-					trace("> LoggerModuleMediator : MainFacade.CONNECT_MAIN_TO_LOGGER");
-					// The junction was passed from ShellJunctionMediator
-					var junction:Junction = note.getBody() as Junction;
-					// Connect the shell's STDLOG to the logger's STDIN
-					var shellToLog:IPipeFitting = junction.retrievePipe(PipeAwareModule.STDLOG);
-					logger.acceptInputPipe(PipeAwareModule.STDIN, shellToLog);
-					// Connect the logger's STDSHELL to the shell's STDIN
-					var logToShell:Pipe = new Pipe();
-					var shellIn:TeeMerge = junction.retrievePipe(PipeAwareModule.STDIN) as TeeMerge;
-					shellIn.connectInput(logToShell);
-					logger.acceptOutputPipe( PipeAwareModule.STDMAIN, logToShell );
+					trace("\n> LoggerModuleMediator : MainFacade.CONNECT_MAIN_TO_LOGGER");
+					// The junction was passed from MainJunctionMediator
+					const mainJunction:Junction = note.getBody() as Junction;
+					// Connect the main's STDLOG to the logger's STDIN
+					const mainToLog:IPipeFitting = mainJunction.retrievePipe(PipeAwareModule.STDLOG);
+					logger.acceptInputPipe(PipeAwareModule.STDIN, mainToLog);
+					
+					// Connect the logger's STDMAIN to the shell's STDIN
+					const logToMain:Pipe = new Pipe();
+					const mainInput:TeeMerge = mainJunction.retrievePipe(PipeAwareModule.STDIN) as TeeMerge;
+					mainInput.connectInput(logToMain);
+					logger.acceptOutputPipe( PipeAwareModule.STDMAIN, logToMain );
 					break;
 			}
 		}

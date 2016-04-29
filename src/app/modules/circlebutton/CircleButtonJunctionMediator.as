@@ -38,7 +38,7 @@ package app.modules.circlebutton
 		 */
 		override public function listNotificationInterests():Array
 		{
-			var interests:Array = super.listNotificationInterests();
+			const interests:Array = super.listNotificationInterests();
 			interests.push(CircleButtonFacade.EXPORT_CIRLE_BUTTON);
 			interests.push(CircleButtonFacade.CLICK_COUNT_CHANGED);
 			
@@ -66,7 +66,7 @@ package app.modules.circlebutton
 					break;
 				
 				case CircleButtonFacade.ASK_FOR_CIRCLE_BUTTON_PARAMERTS:
-					sendNotification(LogMessage.SEND_TO_LOG, "Circle Button request parameters from worker", LogMessage.LEVELS[LogMessage.INFO]);
+					sendNotification(LogMessage.SEND_TO_LOG, "Circle Button request parameters from worker: " + this.multitonKey, LogMessage.LEVELS[LogMessage.INFO]);
 					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_CIRCLE_BUTTON, null, CircleMakerModule.RECIEVE_CIRCLE_BUTTON_PARAMERTS ) );
 					break;
 				
@@ -81,19 +81,33 @@ package app.modules.circlebutton
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-			trace("> CircleMaker : Junction.handlePipeMessage:", message);
+			trace("> CircleMaker : Junction.handlePipeMessage:\n", JSON.stringify(message) + "\n");
 			if(message is WorkerResponceMessage) {
 				switch(message.getType())
 				{
 					case CircleMakerModule.RECIEVE_CIRCLE_BUTTON_PARAMERTS:
 					{
-						const workerInputPipe:IPipeFitting = junction.retrievePipe( PipeAwareModule.FROMWRK );
-						workerInputPipe.disconnect();
-						junction.removePipe( PipeAwareModule.FROMWRK );
+						DisconnectFromWorker();
 						sendNotification(CircleButtonFacade.SETUP_CIRCLE_BUTTON_PARAMETERS, WorkerResponceMessage(message).data);
 						break;
 					}
 				}
+			}
+		}
+		
+		private function DisconnectFromWorker():void
+		{
+			const workerInputPipe:IPipeFitting = junction.retrievePipe( PipeAwareModule.FROMWRK );
+//			trace("workerInputPipe", workerInputPipe);
+			if(workerInputPipe) {
+				workerInputPipe.disconnect();
+				junction.removePipe( PipeAwareModule.FROMWRK );
+			}
+			const workerOutputPipe:IPipeFitting = junction.retrievePipe( PipeAwareModule.TOWRK );
+//			trace("workerOutputPipe", workerOutputPipe);
+			if(workerOutputPipe) {
+				workerOutputPipe.disconnect();
+				junction.removePipe( PipeAwareModule.TOWRK );
 			}
 		}
 	}

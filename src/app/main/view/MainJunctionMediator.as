@@ -2,15 +2,14 @@ package app.main.view
 {
 	import app.common.LogMessage;
 	import app.common.LoggingJunction;
-	import app.common.worker.WorkerResponceMessage;
 	import app.common.PipeAwareModule;
 	import app.common.UIQueryMessage;
 	import app.common.worker.WorkerRequestMessage;
+	import app.common.worker.WorkerResponceMessage;
+	import app.main.MainFacade;
 	import app.modules.CircleMakerModule;
 	import app.modules.LoggerModule;
 	import app.modules.WorkerModule;
-	import app.main.MainFacade;
-	
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeAware;
@@ -41,19 +40,37 @@ package app.main.view
 		 */
 		override public function onRegister():void
 		{
-			// The STDOUT pipe from the shell to all modules 
-			junction.registerPipe( PipeAwareModule.STDOUT,  Junction.OUTPUT, new TeeSplit() );
-			
 			// The STDIN pipe to the shell from all modules 
 			junction.registerPipe( PipeAwareModule.STDIN,  Junction.INPUT, new TeeMerge() );
+			junction.registerPipe( PipeAwareModule.FROMWRK, Junction.INPUT, new TeeMerge() );
+			
+			junction.addPipeListener( PipeAwareModule.FROMWRK, this, handleWorkerPipeMessage );
 			junction.addPipeListener( PipeAwareModule.STDIN, this, handlePipeMessage );
 			
 			// The STDLOG pipe from the shell to the logger
-			junction.registerPipe( PipeAwareModule.STDLOG, Junction.OUTPUT, new Pipe() );
-			junction.registerPipe( PipeAwareModule.TOWRK, Junction.OUTPUT, new Pipe() );
+			junction.registerPipe( PipeAwareModule.STDLOG, 	Junction.OUTPUT, new Pipe() );
+			junction.registerPipe( PipeAwareModule.TOWRK, 	Junction.OUTPUT, new Pipe() );
+			// The STDOUT pipe from the shell to all modules 
+			junction.registerPipe( PipeAwareModule.STDOUT,  Junction.OUTPUT, new TeeSplit() );
 			
 			sendNotification(MainFacade.CONNECT_MAIN_TO_LOGGER, junction );
 			sendNotification(MainFacade.CONNECT_MAIN_TO_WORKER, junction );
+		}
+		
+		private function handleWorkerPipeMessage(message:IPipeMessage):void
+		{
+			trace("> MainJunctionMediator.handleWorkerPipeMessage:\n" + JSON.stringify(message) + "\n");
+			if ( message is WorkerResponceMessage ) 
+			{
+				switch ( WorkerResponceMessage(message).getType() ) 
+				{
+					case WorkerModule.MESSAGE_TO_MAIN_SET_COLOR:
+						const color:uint = uint(WorkerResponceMessage(message).data);
+						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
+						junction.sendMessage(PipeAwareModule.STDLOG, new LogMessage(LogMessage.INFO, this.multitonKey, 'New color for main is recived: ' + color));
+						break;
+				}
+			}
 		}
 		
 		/**
@@ -75,13 +92,21 @@ package app.main.view
 		 */
 		override public function handleNotification( note:INotification ):void
 		{
+//			trace("\n> MainJunctionMediator.handleNotification:", note.getName());
 			switch( note.getName() )
 			{
 				case MainFacade.GET_MODULE_LOGGER:
-					junction.sendMessage(PipeAwareModule.STDLOG, new UIQueryMessage(UIQueryMessage.GET, LoggerModule.GET_LOG_UI));
+					trace("\t\t : MainFacade.GET_MODULE_LOGGER")
+					junction.sendMessage( PipeAwareModule.STDLOG, new UIQueryMessage(UIQueryMessage.GET, LoggerModule.GET_LOG_UI));
 					break;
 				case MainFacade.WORKER_GET_MAIN_COLOR:
 					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, WorkerModule.MESSAGE_TO_MAIN_SET_COLOR	));
+//					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, function(data:WorkerResponceMessage):void{
+//						trace(">>>>> RECEIVED COLOR: " + data);
+//						const color:uint = uint(data.data);
+//						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
+//						junction.sendMessage( PipeAwareModule.STDLOG, new LogMessage( 0, this.multitonKey, "Color received by main: " + color) );
+//					}));
 					break;
 				case  MainFacade.CONNECT_MODULE_TO_MAIN:
 					// Connect a module's STDSHELL to the shell's STDIN
@@ -127,16 +152,6 @@ package app.main.view
 						break;
 				}
 			} 
-			else if ( message is WorkerResponceMessage ) 
-			{
-				switch ( WorkerResponceMessage(message).getType() ) 
-				{
-					case WorkerModule.MESSAGE_TO_MAIN_SET_COLOR:
-						sendNotification(MainFacade.APPLY_MAIN_COLOR, WorkerResponceMessage(message).data )
-						junction.sendMessage(PipeAwareModule.STDLOG, new LogMessage(LogMessage.INFO, this.multitonKey, 'New color for main is recived'));
-					break;
-				}
-			}
 		}
 	}
 }

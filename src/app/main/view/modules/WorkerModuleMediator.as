@@ -45,30 +45,30 @@ package app.main.view.modules
 			switch( note.getName() )
 			{
 				case  MainFacade.CONNECT_MODULE_TO_WORKER:
-					trace("> WorkerModuleMediator : MainFacade.CONNECT_MODULE_TO_WORKER");
+					trace("\n> WorkerModuleMediator : MainFacade.CONNECT_MODULE_TO_WORKER", note.getBody());
 
 					const workerOutPipe	: Pipe = new Pipe();
 					const workerInPipe	: Pipe = new Pipe();
 					const moduleIn		: IPipeAware = note.getBody() as IPipeAware;
 					
 					worker.acceptInputPipe( PipeAwareModule.WRKIN, workerInPipe );
-					worker.acceptOutputPipe( PipeAwareModule.WRKOUT, workerOutPipe );
-					
 					moduleIn.acceptOutputPipe( PipeAwareModule.TOWRK, workerInPipe );
+					
+					worker.acceptOutputPipe( PipeAwareModule.WRKOUT, workerOutPipe );
 					moduleIn.acceptInputPipe( PipeAwareModule.FROMWRK, workerOutPipe );
 					
 					break;
 
 				// Bidirectionally connect main and worker on TOWRK/STDMAIN
 				case  MainFacade.CONNECT_MAIN_TO_WORKER:
-					trace("> WorkerModuleMediator : MainFacade.CONNECT_MAIN_TO_WORKER")
+					trace("\n> WorkerModuleMediator : MainFacade.CONNECT_MAIN_TO_WORKER")
 					// The junction was passed from MainJunctionMediator
 					const wrkToMain		: Pipe 			= new Pipe();
-					const junction		: Junction 		= note.getBody() as Junction;
+					const mainJunction	: Junction 		= note.getBody() as Junction;
 					
-					const mainWrkPipe	: IPipeFitting 	= junction.retrievePipe(PipeAwareModule.TOWRK);
+					const mainWrkPipe	: IPipeFitting 	= mainJunction.retrievePipe(PipeAwareModule.TOWRK);
 					
-					const mainInPipe	: TeeMerge 		= junction.retrievePipe(PipeAwareModule.STDIN) as TeeMerge;
+					const mainInPipe	: TeeMerge 		= mainJunction.retrievePipe(PipeAwareModule.FROMWRK) as TeeMerge;
 					
 					worker.acceptInputPipe( PipeAwareModule.WRKIN, 		mainWrkPipe );
 					worker.acceptOutputPipe( PipeAwareModule.WRKOUT, 	wrkToMain );
@@ -76,8 +76,6 @@ package app.main.view.modules
 					mainInPipe.connectInput(wrkToMain);
 					
 					break;
-				
-				
 			}
 		}
 		

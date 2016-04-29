@@ -1,8 +1,3 @@
-/*
- PureMVC AS3/MultiCore Utility – Pipes
- Copyright (c) 2008 Cliff Hall<cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
@@ -16,7 +11,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	public class TeeSplit implements IPipeFitting
 	{
 		private var _outputs:Array = new Array();
-		
+		private var _pipeName:String;
 		/**
 		 * Constructor.
 		 * <P>
@@ -40,6 +35,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		public function connect( output:IPipeFitting ):Boolean
 		{
+			output.pipeName = this.pipeName;
 			_outputs.push(output);
 			return true;
 		}
@@ -109,6 +105,8 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			}
 			return success;	
 		}
-		
+
+		public function get pipeName():String { return _pipeName; }
+		public function set pipeName(value:String):void { _pipeName = value; }
 	}
 }

@@ -1,25 +1,27 @@
 
 package app.modules.logger
 {
-	import flash.display.DisplayObject;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
 	
 	import app.common.LogFilterMessage;
 	import app.common.LogMessage;
 	import app.common.PipeAwareModule;
 	import app.common.UIQueryMessage;
 	import app.common.worker.WorkerRequestMessage;
+	import app.common.worker.WorkerResponceMessage;
 	import app.modules.LoggerModule;
 	import app.modules.WorkerModule;
 	import app.modules.logger.LoggerFacade;
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
-	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.Filter;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.Junction;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.JunctionMediator;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.PipeListener;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.TeeMerge;
+	import org.puremvc.as3.multicore.utilities.pipes.plumbing.TeeSplit;
 	
 	public class LoggerJunctionMediator extends JunctionMediator
 	{
@@ -39,49 +41,51 @@ package app.modules.logger
 			);
 			filter.connect(new PipeListener(this, handlePipeMessage));
 			teeMerge.connect(filter);
+			
 			junction.registerPipe( PipeAwareModule.STDIN, Junction.INPUT, teeMerge );
-			junction.registerPipe( PipeAwareModule.TOWRK, Junction.INPUT, new TeeMerge() );
+//			junction.addPipeListener( PipeAwareModule.STDIN, this, handlePipeMessage);
+			
+			junction.registerPipe( PipeAwareModule.FROMWRK, Junction.INPUT, new TeeMerge() );
+			junction.addPipeListener(PipeAwareModule.FROMWRK, this, handleWorkerPipeMessage);
+//
+			junction.registerPipe( PipeAwareModule.TOWRK, Junction.OUTPUT, new TeeSplit() );
+			junction.registerPipe( PipeAwareModule.STDMAIN, Junction.OUTPUT, new TeeSplit() );
+			
+		}
+		
+		private function handleWorkerPipeMessage(message:IPipeMessage):void
+		{
+			trace("> LoggerJunctionMediator.handleWorkerPipeMessage:\n" + JSON.stringify(message) + "\n");
 		}
 		
 		override public function listNotificationInterests():Array
 		{
-			var interests:Array = super.listNotificationInterests();
-			interests.push(LoggerFacade.EXPORT_LOG_UI);
-			interests.push(LogMessage.SEND_TO_LOG);
+			const interests:Array = super.listNotificationInterests();
+			interests.push( LoggerFacade.EXPORT_LOG_UI );
+			interests.push( LogMessage.SEND_TO_LOG );
 			return interests;
 		}
 	
 		override public function handleNotification( note:INotification ):void
 		{
-			
+			trace("\n> LoggerJunctionMediator.handleNotification", note.getName());
+			const type:String = note.getType();
 			switch( note.getName() )
 			{
 				// Send the LogWindow UI Component 
 				case LoggerFacade.EXPORT_LOG_UI:
-					trace("LoggerFacade.EXPORT_LOG_UI");
-					const logWindowMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, LoggerModule.MESSAGE_TO_MAIN_LOG_UI, note.getBody() as DisplayObject);
-//					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_LOG_SIZE, null, function(value:int):void {
+					trace("\t\t : LoggerFacade.EXPORT_LOG_UI");
+					const loggerTF:TextField = note.getBody() as TextField;
+					const logWindowMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, LoggerModule.MESSAGE_TO_MAIN_LOG_UI, loggerTF);
+					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_LOG_SIZE, null, function(result:WorkerResponceMessage):void {
+						const fontSize:uint = uint(result.data);
+						trace("Message from worker received by logger", fontSize);
+						const format:TextFormat = loggerTF.getTextFormat();
+						format.size = fontSize;
+						loggerTF.defaultTextFormat = format;
 						junction.sendMessage( PipeAwareModule.STDMAIN, logWindowMessage );
-//					} ));
+					}));
 					break;
-					
-				// Add an input pipe (special handling for LoggerModule) 
-				case JunctionMediator.ACCEPT_INPUT_PIPE:
-					const name:String = note.getType();
-					trace(name);
-					// STDIN is a Merging Tee. Overriding super to handle this.
-//					if (name == PipeAwareModule.STDIN) {
-					const pipe:IPipeFitting = note.getBody() as IPipeFitting;
-					const tee:TeeMerge = junction.retrievePipe(name) as TeeMerge;
-					tee.connectInput(pipe);
-//					} 
-					// Use super for any other input pipe
-//					else {
-//						super.handleNotification(note); 
-//					} 
-					break;
-
-				// And let super handle the rest (ACCEPT_OUTPUT_PIPE)								
 				default:
 					super.handleNotification(note);
 					
@@ -93,6 +97,7 @@ package app.modules.logger
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
+			trace("> LoggerJunctionMediator: handlePipeMessage =", JSON.stringify(message));
 			if ( message is LogMessage ) 
 			{
 				sendNotification( LoggerFacade.LOG_MSG, message );

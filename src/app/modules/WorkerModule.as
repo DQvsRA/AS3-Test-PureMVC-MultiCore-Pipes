@@ -1,7 +1,6 @@
 
 package app.modules
 {
-	import flash.desktop.NativeApplication;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.system.MessageChannel;
@@ -39,6 +38,7 @@ package app.modules
 			isReady 		: Boolean
 		,	isMaster 		: Boolean
 		,	isSupported		: Boolean
+		,	isBusy			: Boolean
 		;
 		
 		public var incomingMessageChannel:MessageChannel;
@@ -47,6 +47,8 @@ package app.modules
 		protected var _worker  		: Worker;
 		protected var _shareable	: ByteArray;
 			
+		private const _tasksQueue:Vector.<WorkerTask> = new Vector.<WorkerTask>();
+		
 		public function WorkerModule(bytes:ByteArray = null)
 		{
 			this.facade = WorkerFacade.getInstance( moduleID );
@@ -75,11 +77,13 @@ package app.modules
 					_shareable.shareable = true;
 					setSharedProperty(SHARE_DATA_PIPE, _shareable);
 					
+					isBusy = true;
+					
 					_worker.start();
 					
-					if(NativeApplication) NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, function(e:Event):void {
-						_worker.terminate();
-					}, false, 0, true);
+//					if(NativeApplication) NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, function(e:Event):void {
+//						_worker.terminate();
+//					}, false, 0, true);
 					
 				} else {
 					_worker = Worker.current;
@@ -89,6 +93,8 @@ package app.modules
 					
 					_shareable = getSharedProperty(SHARE_DATA_PIPE);
 					_shareable.shareable = true;
+					
+					isBusy = false;
 					
 					Starting();
 				}
@@ -104,27 +110,44 @@ package app.modules
 		//==================================================================================================	
 		public function send(task:WorkerTask):void {
 		//==================================================================================================	
-			trace("> WorkerModule -> SEND MESSAGE: isMaster =", task);
-			setSharedData(task.data);
-			outputChannel.send(task.id, 0);
+//			trace("> WorkerModule -> SEND MESSAGE: M =", isMaster, task.id);
+			
+			if(isBusy) {
+				_tasksQueue.push(task);
+			} else {
+				isBusy = true;
+				setSharedData(task.data);
+				outputChannel.send(task.id, 0);
+			}
 		}
 		
 		//==================================================================================================
 		private function MasterHanlder_WorkerState(e:Event):void {
 		//==================================================================================================
-			trace("> WorkerModule : MasterHanlder_WorkerState", e.currentTarget.state == WorkerState.RUNNING);
+//			trace("> WorkerModule -> MasterHanlder_WorkerState:", e.currentTarget.state == WorkerState.RUNNING, isReady);
 			switch(e.currentTarget.state) {
 				case WorkerState.RUNNING: Starting(); break;
 				case WorkerState.NEW: break;				
 				case WorkerState.TERMINATED: break;					
 			}
-		}
-		
+		}		
 				
 		//==================================================================================================	
 		public function getSharedProperty(id:String):* {
 		//==================================================================================================	
 			return _worker.getSharedProperty(id);
+		}
+		
+		//==================================================================================================	
+		public function completeTask():void {
+		//==================================================================================================	
+			isBusy = false;
+			trace("\n> COMPLETE TASK => TASK QUEUE:", isMaster, _tasksQueue.length);
+			if(_tasksQueue.length) {
+				const task:WorkerTask = _tasksQueue.shift();
+				trace("\t\t : TASK:", JSON.stringify(task));
+				this.send(task);
+			}
 		}
 		
 		//==================================================================================================	
@@ -136,8 +159,8 @@ package app.modules
 		//==================================================================================================	
 		public function setSharedData(data:*):void {
 		//==================================================================================================	
+			_shareable.clear();
 			if(data) {
-				_shareable.clear();
 				_shareable.writeObject(data);
 			}
 		}
@@ -162,6 +185,7 @@ package app.modules
 		//==================================================================================================	
 		private function Starting():void {
 		//==================================================================================================	
+//			trace("> WorkerModule -> Starting: M =", isMaster);
 			WorkerFacade(facade).startup( this );
 		}
 		

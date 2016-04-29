@@ -61,6 +61,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var success:Boolean = true;
 			if ( pipesMap[name] == null )
 			{
+				pipe.pipeName = name;
 				pipesMap[name] = pipe;
 				pipeTypesMap[name] = type;
 				switch (type) {
@@ -173,7 +174,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var success:Boolean=false;
 			if ( hasPipe(inputPipeName) )
 			{
-				var pipe:IPipeFitting = pipesMap[inputPipeName] as IPipeFitting;
+				const pipe:IPipeFitting = pipesMap[inputPipeName] as IPipeFitting;
 				success = pipe.connect( new PipeListener(context, listener) );
 			} 
 			return success;

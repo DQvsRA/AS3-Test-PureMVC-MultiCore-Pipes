@@ -22,7 +22,7 @@ package app.modules.worker.controller.commands
 				overColor 	: Math.random()*0xffffff, 
 				downColor 	: Math.random()*0xffffff
 			};
-			sendNotification(WorkerFacade.SEND_RESULT_CIRCLE_BUTTON_PARAMETERS, outputParameters, note.getType());
+			sendNotification(WorkerFacade.SEND_RESULT_CIRCLE_BUTTON, outputParameters, note.getType());
 		}
 	}
 }

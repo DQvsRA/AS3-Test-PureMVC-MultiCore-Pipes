@@ -1,16 +1,19 @@
 package app.main.controller
 {
-	import app.modules.WorkerModule;
+	import flash.events.EventDispatcher;
+	
 	import app.main.MainFacade;
 	import app.main.view.MainJunctionMediator;
 	import app.main.view.MainMediator;
 	import app.main.view.modules.LoggerModuleMediator;
 	import app.main.view.modules.WorkerModuleMediator;
-	import flash.events.EventDispatcher;
+	import app.modules.WorkerModule;
+	
 	import nest.services.worker.events.WorkerEvent;
-    import org.puremvc.as3.multicore.interfaces.ICommand;
-    import org.puremvc.as3.multicore.interfaces.INotification;
-    import org.puremvc.as3.multicore.patterns.command.SimpleCommand;
+	
+	import org.puremvc.as3.multicore.interfaces.ICommand;
+	import org.puremvc.as3.multicore.interfaces.INotification;
+	import org.puremvc.as3.multicore.patterns.command.SimpleCommand;
 
 	public class MainStartupCommand extends SimpleCommand implements ICommand
     {
@@ -36,16 +39,18 @@ package app.main.controller
 		//==================================================================================================	
 		private function ContinueInitialize(e:WorkerEvent = null):void {
 		//==================================================================================================	
-			trace("> MainStartupCommand : ContinueInitialize", e);
+			trace("\n======================================\n> MainStartupCommand : ContinueInitialize", e);
 			
 			if (e) (e.currentTarget as EventDispatcher).removeEventListener(WorkerEvent.READY, ContinueInitialize);
+			
 			// Create and Register the Logger Module and its Mediator
 			facade.registerMediator( new LoggerModuleMediator() );
 			// Create and Register the Shell Junction and its Mediator
 			facade.registerMediator( new MainJunctionMediator() );
+		
 			// Request the Log UI from the Logger Module   
-			facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );
 			facade.sendNotification( MainFacade.GET_MODULE_LOGGER );
+			facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );
 		}
     }
 }

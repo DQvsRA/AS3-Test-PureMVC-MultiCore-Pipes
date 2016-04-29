@@ -48,13 +48,14 @@ package app.modules.worker
 		{
 			var interests:Array = super.listNotificationInterests();
 			interests.push(WorkerFacade.SEND_RESULT_MAIN_COLOR);
-			interests.push(WorkerFacade.SEND_RESULT_CIRCLE_BUTTON_PARAMETERS);
+			interests.push(WorkerFacade.SEND_RESULT_CIRCLE_BUTTON);
+			interests.push(WorkerFacade.SEND_RESULT_LOG_SIZE);
 			return interests;
 		}
 	
 		override public function handleNotification( note:INotification ):void
 		{
-			trace("> WorkerJunction.handleNotification : ", note);
+			trace("\n> WorkerJunctionMediator.handleNotification : ", note.getName(), note.getType());
 			const type:String = note.getType();
 			switch( note.getName() )
 			{
@@ -62,8 +63,11 @@ package app.modules.worker
 					trace("> \t\t : SEND_RESULT_MAIN_COLOR", junction.hasPipe(PipeAwareModule.WRKOUT));
 					junction.sendMessage(PipeAwareModule.WRKOUT, new WorkerResponceMessage(note.getType(), note.getBody()));
 					break;
-				
-				case WorkerFacade.SEND_RESULT_CIRCLE_BUTTON_PARAMETERS:
+				case WorkerFacade.SEND_RESULT_LOG_SIZE:
+					trace("> \t\t : SEND_RESULT_LOG_SIZE", junction.hasPipe(PipeAwareModule.WRKOUT));
+					junction.sendMessage(PipeAwareModule.WRKOUT, new WorkerResponceMessage(note.getType(), note.getBody()));
+					break;
+				case WorkerFacade.SEND_RESULT_CIRCLE_BUTTON:
 					trace("> \t\t : SEND_RESULT_CIRCLE_BUTTON", junction.hasPipe(PipeAwareModule.WRKOUT));
 					junction.sendMessage(PipeAwareModule.WRKOUT, new WorkerResponceMessage(note.getType(), note.getBody()));
 					break;
@@ -71,10 +75,11 @@ package app.modules.worker
 				// Add an input pipe (special handling for WorkerModule) 
 				case JunctionMediator.ACCEPT_INPUT_PIPE:
 					// STDIN is a Merging Tee. Overriding super to handle this.
-					trace("> \t\t : ACCEPT_INPUT_PIPE, name =", type, WorkerFacade(facade).isMaster, junction.hasInputPipe(type));
+					trace("> \t\t : ACCEPT_INPUT_PIPE Type:", type);
 					if (type == PipeAwareModule.WRKIN && junction.hasInputPipe(type)) {
 						const pipeIn:IPipeFitting = note.getBody() as IPipeFitting;
 						const teeIn:TeeMerge = junction.retrievePipe(type) as TeeMerge;
+						trace("> \t\t : connectInput", teeIn, pipeIn);
 						teeIn.connectInput(pipeIn);
 					} 
 					// Use super for any other input pipe
@@ -83,9 +88,11 @@ package app.modules.worker
 					}
 					break;
 				case JunctionMediator.ACCEPT_OUTPUT_PIPE:
+					trace("> \t\t : ACCEPT_OUTPUT_PIPE Type:", type);
 					if (type == PipeAwareModule.WRKOUT && junction.hasOutputPipe(type)) {
 						const pipeOut:IPipeFitting = note.getBody() as IPipeFitting;
 						const teeOut:TeeSplit = junction.retrievePipe(type) as TeeSplit;
+						trace("> \t\t : connect", teeOut, pipeOut);
 						teeOut.connect(pipeOut);
 					} 
 					break;
@@ -101,29 +108,31 @@ package app.modules.worker
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-			trace("\nWorkerJunction.handlePipeMessage : ", message.getType());
+			trace("\nWorkerJunctionMediator.handlePipeMessage : ", message.getType());
 			
 			if(message is WorkerRequestMessage) {
 				
 				const workerMessage:WorkerRequestMessage = message as WorkerRequestMessage
-				
+				var commandToExecute:String;
 				switch(workerMessage.request)
 				{
-					case WorkerModule.CALCULATE_LOG_SIZE: {
-						
+					case WorkerModule.CALCULATE_LOG_SIZE: 
+					{
+						commandToExecute = WorkerFacade.CMD_CALCULATE_LOG_SIZE; 
 						break;	
 					}
 					case WorkerModule.CALCULATE_MAIN_COLOR:
 					{
-						sendNotification(WorkerFacade.CMD_CALCULATE_MAIN_COLOR, workerMessage.data, workerMessage.responce);
+						commandToExecute = WorkerFacade.CMD_CALCULATE_MAIN_COLOR;
 						break;
 					}
 					case WorkerModule.CALCULATE_CIRCLE_BUTTON:
 					{
-						sendNotification(WorkerFacade.CMD_CALCULATE_CIRCLE_BUTTON, workerMessage.data, workerMessage.responce);
+						commandToExecute = WorkerFacade.CMD_CALCULATE_CIRCLE_BUTTON;
 						break;
 					}	
 				}
+				if(commandToExecute) sendNotification(commandToExecute, workerMessage.data, workerMessage.responce)
 			}
 		}
 	}

@@ -75,14 +75,18 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 					const inputPipeName	: String = note.getType();
 					const inputPipe		: IPipeFitting = note.getBody() as IPipeFitting;
 					
-//					if(junction.hasInputPipe(inputPipeName)) {
-//						
-//					} else {
+					if(junction.hasInputPipe(inputPipeName)) {
+						trace("\t\t : ACCEPT_INPUT_PIPE =", inputPipeName);
+						const incomePipeIn	: IPipeFitting = note.getBody() as IPipeFitting;
+						const teeInput		: TeeMerge = junction.retrievePipe(inputPipeName) as TeeMerge;
+						trace("\t\t : Connect =", teeInput.pipeName, incomePipeIn);
+						teeInput.connectInput(incomePipeIn);	
+					} else {
 						if ( junction.registerPipe(inputPipeName, Junction.INPUT, inputPipe) ) 
 						{
 							junction.addPipeListener( inputPipeName, this, handlePipeMessage );		
 						} 
-//					}
+					}
 					
 					
 					break;
@@ -91,31 +95,15 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 				case JunctionMediator.ACCEPT_OUTPUT_PIPE:
 					const outputPipeName:String = note.getType();
 					const outputPipe:IPipeFitting = note.getBody() as IPipeFitting;
-					junction.registerPipe( outputPipeName, Junction.OUTPUT, outputPipe );
+					trace("\t\t : ACCEPT_OUTPUT_PIPE =", outputPipeName);
+					if(junction.hasOutputPipe(outputPipeName)) {
+						const teeForOutput:IPipeFitting = junction.retrievePipe(outputPipeName) as IPipeFitting;
+						trace("\t\t : Connect =", teeForOutput.pipeName, outputPipe);
+						teeForOutput.connect(outputPipe);
+					} else {
+						junction.registerPipe( outputPipeName, Junction.OUTPUT, outputPipe );
+					}
 					break;
-					
-				
-//				case JunctionMediator.ACCEPT_INPUT_PIPE:
-					// STDIN is a Merging Tee. Overriding super to handle this.
-//					trace("> \t\t : ACCEPT_INPUT_PIPE, name =", type, WorkerFacade(facade).isMaster, junction.hasInputPipe(type));
-//					if (type == PipeAwareModule.WRKIN && junction.hasInputPipe(type)) {
-//						const pipeIn:IPipeFitting = note.getBody() as IPipeFitting;
-//						const teeIn:TeeMerge = junction.retrievePipe(type) as TeeMerge;
-//						teeIn.connectInput(pipeIn);
-//					} 
-//						// Use super for any other input pipe
-//					else {
-//						super.handleNotification(note); 
-//					}
-//					break;
-//				case JunctionMediator.ACCEPT_OUTPUT_PIPE:
-//					if (type == PipeAwareModule.WRKOUT && junction.hasOutputPipe(type)) {
-//						const pipeOut:IPipeFitting = note.getBody() as IPipeFitting;
-//						const teeOut:TeeSplit = junction.retrievePipe(type) as TeeSplit;
-//						teeOut.connect(pipeOut);
-//					} 
-//					break;
-				
 			}
 		}
 		

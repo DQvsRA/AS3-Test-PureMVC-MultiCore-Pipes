@@ -18,6 +18,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	public class Pipe implements IPipeFitting
 	{
 		protected var output:IPipeFitting;
+		private var _pipeName:String;
 
 		public function Pipe( output:IPipeFitting = null )
 		{
@@ -36,6 +37,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		{
 			var success:Boolean = false;
 			if (this.output == null) {
+				output.pipeName = this.pipeName;
 				this.output = output;
 				success = true;
 			}
@@ -71,6 +73,11 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		{
 			return output && output.write( message );
 		}
+
+		public function get pipeName():String { return _pipeName; }
+
+		public function set pipeName(value:String):void { _pipeName = value; }
+
 		
 	}
 }

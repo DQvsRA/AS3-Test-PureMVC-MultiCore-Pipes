@@ -17,10 +17,12 @@ package app.modules.worker
 		
 		static public const CONNECT_MODULE_TO_WORKER	: String = "connectModuleToWorker";
 		static public const SEND_RESULT_MAIN_COLOR		: String = "sendResultToStageColor";
-		static public const SEND_RESULT_CIRCLE_BUTTON_PARAMETERS	: String = "sendResultToCircleButton";
+		static public const SEND_RESULT_CIRCLE_BUTTON	: String = "sendResultToCircleButton";
+		static public const SEND_RESULT_LOG_SIZE		: String = "sendResultToLogSize";
 
 		static public const CMD_CALCULATE_MAIN_COLOR	: String = "commandCalculateMainColor";
 		static public const CMD_CALCULATE_CIRCLE_BUTTON	: String = "commandCalculateCircleButton";
+		static public const CMD_CALCULATE_LOG_SIZE		: String = "commandCalculateLogSize";
 		
 		public var isMaster:Boolean;
 		

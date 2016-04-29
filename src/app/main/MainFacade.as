@@ -1,8 +1,3 @@
-/*
- PureMVC AS3 MultiCore Demo – Flex PipeWorks 
- Copyright (c) 2008 Cliff Hall <cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package app.main
 {
 	import app.main.controller.modules.CircleMakerModuleCreateCommand;
@@ -23,7 +18,7 @@ package app.main
 		
 		static public const CONNECT_MAIN_TO_LOGGER		:String = "connectMainToLogger";
 		static public const CONNECT_MAIN_TO_WORKER		:String = "connectMainToWorker";
-
+		
 		/* JUNCTION NOTES */
 		static public const CREATE_MODULE_CIRCLE_MAKER	:String = "cretateModuleCircleMaker";
 		static public const APPEND_CIRCLE_BUTTON		:String = "appendCircleButton";
@@ -33,7 +28,7 @@ package app.main
 		static public const GET_MODULE_LOGGER			:String = "getLogger";
 		static public const APPEND_LOG_WINDOW			:String = "appendLogWindow";
 		static public const APPLY_MAIN_COLOR			:String = "applyMainColor";
-       
+		
         public function MainFacade( key:String )
         {
             super(key);

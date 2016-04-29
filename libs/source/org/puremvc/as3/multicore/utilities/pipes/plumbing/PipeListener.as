@@ -15,6 +15,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	{
 		private var context:Object;
 		private var listener:Function;
+		private var _pipeName:String;
 		
 		public function PipeListener( context:Object, listener:Function )
 		{
@@ -44,5 +45,9 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			listener.apply(context,[message]);
 			return true;
 		}
+
+		public function get pipeName():String { return _pipeName; }
+		public function set pipeName(value:String):void { _pipeName = value; }
+
 	}
 }
