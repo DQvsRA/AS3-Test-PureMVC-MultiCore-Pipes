@@ -1,5 +1,7 @@
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
+	import flash.utils.getTimer;
+	
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 	
@@ -10,8 +12,11 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	 */
 	public class TeeSplit implements IPipeFitting
 	{
-		private var _outputs:Array = new Array();
-		private var _pipeName:String;
+		private var 
+			_outputs	: Array = new Array()
+		,	_id			: uint = getTimer()
+		,	_pipeName	: String
+		;
 		/**
 		 * Constructor.
 		 * <P>
@@ -52,7 +57,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		{
 			return _outputs.pop() as IPipeFitting;
 		}
-
+		
 		/** 
 		 * Disconnect a given output fitting. 
 		 * <P>
@@ -69,16 +74,22 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		public function disconnectFitting( target:IPipeFitting ):IPipeFitting 
 		{
 			var removed:IPipeFitting;
-			for (var i:int=0;i<_outputs.length;i++)
-			{
-				var output:IPipeFitting = _outputs[i];
-				if (output === target) {
-					_outputs.splice(i,1);	
-					removed=output;
+			var output:IPipeFitting;
+			var length:uint = _outputs.length;
+			while(length--) {
+				output = _outputs[length];
+				if (output.id === target.id) {
+					removed = _outputs.removeAt(length);
+					trace("disconnectFitting", removed);
 					break;
 				}
 			}
 			return removed;
+		}
+		
+		public function outputsCount():uint
+		{
+			return _outputs.length;
 		}
 
 		/**
@@ -108,5 +119,9 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 
 		public function get pipeName():String { return _pipeName; }
 		public function set pipeName(value:String):void { _pipeName = value; }
+
+		public function get id():uint { return _id; }
+		public function set id(value:uint):void { _id = value; }
+
 	}
 }

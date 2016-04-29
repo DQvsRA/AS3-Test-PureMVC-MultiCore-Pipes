@@ -36,7 +36,7 @@ package app.modules.logger
 		{
 			const teeMerge:TeeMerge = new TeeMerge();
 			const filter:Filter = new Filter( 
-				LogFilterMessage.LOG_FILTER_NAME,  null,
+				LogFilterMessage.LOG_FILTER_NAME, null,
 				LogFilterMessage.filterLogByLevel as Function
 			);
 			filter.connect(new PipeListener(this, handlePipeMessage));
@@ -50,7 +50,6 @@ package app.modules.logger
 //
 			junction.registerPipe( PipeAwareModule.TOWRK, Junction.OUTPUT, new TeeSplit() );
 			junction.registerPipe( PipeAwareModule.STDMAIN, Junction.OUTPUT, new TeeSplit() );
-			
 		}
 		
 		private function handleWorkerPipeMessage(message:IPipeMessage):void
@@ -68,18 +67,18 @@ package app.modules.logger
 	
 		override public function handleNotification( note:INotification ):void
 		{
-			trace("\n> LoggerJunctionMediator.handleNotification", note.getName());
+//			trace("\n> LoggerJunctionMediator.handleNotification", note.getName());
 			const type:String = note.getType();
 			switch( note.getName() )
 			{
 				// Send the LogWindow UI Component 
 				case LoggerFacade.EXPORT_LOG_UI:
-					trace("\t\t : LoggerFacade.EXPORT_LOG_UI");
+//					trace("\t\t : LoggerFacade.EXPORT_LOG_UI");
 					const loggerTF:TextField = note.getBody() as TextField;
 					const logWindowMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, LoggerModule.MESSAGE_TO_MAIN_LOG_UI, loggerTF);
 					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_LOG_SIZE, null, function(result:WorkerResponceMessage):void {
 						const fontSize:uint = uint(result.data);
-						trace("Message from worker received by logger", fontSize);
+//						trace("Message from worker received by logger", fontSize);
 						const format:TextFormat = loggerTF.getTextFormat();
 						format.size = fontSize;
 						loggerTF.defaultTextFormat = format;
@@ -97,7 +96,7 @@ package app.modules.logger
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-			trace("> LoggerJunctionMediator: handlePipeMessage =", JSON.stringify(message));
+//			trace("> LoggerJunctionMediator: handlePipeMessage =", JSON.stringify(message));
 			if ( message is LogMessage ) 
 			{
 				sendNotification( LoggerFacade.LOG_MSG, message );

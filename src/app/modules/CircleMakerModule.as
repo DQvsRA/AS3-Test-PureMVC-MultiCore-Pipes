@@ -17,7 +17,7 @@ package app.modules
 		
 		public function exportToMain():void
 		{
-			trace("> CircleMaker : Module.exportToMain");
+//			trace("> CircleMaker : Module.exportToMain");
 			facade.sendNotification(CircleButtonFacade.GET_CIRCLE_BUTTON);
 		}
 		

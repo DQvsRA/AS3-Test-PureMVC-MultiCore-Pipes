@@ -13,9 +13,9 @@ package app.modules.circlebutton
 	import app.modules.circlebutton.CircleButtonFacade;
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
+	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.Junction;
-	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	
 	public class CircleButtonJunctionMediator extends LoggingJunction
 	{
@@ -49,18 +49,18 @@ package app.modules.circlebutton
 
 		override public function handleNotification( note:INotification ):void
 		{
-			trace("> CircleMaker : Junction.handleNotification:", note.getName(), note.getType());
+//			trace("> CircleMaker : Junction.handleNotification:", note.getName(), note.getType());
 			switch( note.getName() )
 			{
 				// Send the LogWindow UI Component 
 				case CircleButtonFacade.CLICK_COUNT_CHANGED:
-					trace("\t\tCLICK_COUNT_CHANGED:", note.getBody());
+//					trace("\t\tCLICK_COUNT_CHANGED:", note.getBody());
 					const moduleKey		: String = note.getType();
 					const clickCount	: int = int(note.getBody());
 					sendNotification(LogMessage.SEND_TO_LOG, moduleKey + " - Circle Button clicked: " + clickCount + " times", LogMessage.LEVELS[LogMessage.INFO]);
 					break;
 				case CircleButtonFacade.EXPORT_CIRLE_BUTTON:
-					trace("\t\tEXPORT_CIRLE_BUTTON:", note.getBody());
+//					trace("\t\tEXPORT_CIRLE_BUTTON:", note.getBody());
 					const circleMakerMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, CircleMakerModule.MESSAGE_TO_MAIN_CIRCLE_MAKER_BUTTON, note.getBody() as DisplayObject );
 					junction.sendMessage( PipeAwareModule.STDMAIN, circleMakerMessage );
 					break;
@@ -81,9 +81,9 @@ package app.modules.circlebutton
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-			trace("> CircleMaker : Junction.handlePipeMessage:\n", JSON.stringify(message) + "\n");
+//			trace("> CircleMaker : Junction.handlePipeMessage:\n", JSON.stringify(message) + "\n");
 			if(message is WorkerResponceMessage) {
-				switch(message.getType())
+				switch(WorkerResponceMessage(message).responce)
 				{
 					case CircleMakerModule.RECIEVE_CIRCLE_BUTTON_PARAMERTS:
 					{
@@ -98,16 +98,26 @@ package app.modules.circlebutton
 		private function DisconnectFromWorker():void
 		{
 			const workerInputPipe:IPipeFitting = junction.retrievePipe( PipeAwareModule.FROMWRK );
-//			trace("workerInputPipe", workerInputPipe);
 			if(workerInputPipe) {
-				workerInputPipe.disconnect();
-				junction.removePipe( PipeAwareModule.FROMWRK );
+				junction.sendMessage( PipeAwareModule.TOWRK, 
+					new WorkerRequestMessage(WorkerModule.DICONNECT_INPUT_PIPE, 
+						workerInputPipe, function(responce:WorkerResponceMessage):void {
+//							trace("===== DISCONNECTED INPUT =====");
+							junction.removePipe( PipeAwareModule.FROMWRK );
+						}
+					)
+				);
 			}
 			const workerOutputPipe:IPipeFitting = junction.retrievePipe( PipeAwareModule.TOWRK );
-//			trace("workerOutputPipe", workerOutputPipe);
 			if(workerOutputPipe) {
-				workerOutputPipe.disconnect();
-				junction.removePipe( PipeAwareModule.TOWRK );
+				junction.sendMessage( PipeAwareModule.TOWRK, 
+					new WorkerRequestMessage(WorkerModule.DICONNECT_OUTPUT_PIPE, 
+						workerOutputPipe, function(responce:WorkerResponceMessage):void{
+//							trace("===== DISCONNECTED OUTPUT =====");
+							junction.removePipe( PipeAwareModule.TOWRK );
+						}
+					)
+				);
 			}
 		}
 	}

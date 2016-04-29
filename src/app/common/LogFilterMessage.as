@@ -2,7 +2,6 @@ package app.common
 {
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 	import org.puremvc.as3.multicore.utilities.pipes.messages.FilterControlMessage;
-	import org.puremvc.as3.multicore.utilities.pipes.messages.Message;
 
 	public class LogFilterMessage extends FilterControlMessage
 	{
@@ -18,9 +17,10 @@ package app.common
 			this.logLevel=logLevel; 
 		}
 		
-		public static function filterLogByLevel( message:IPipeMessage, params:Object):void		
+		public static function filterLogByLevel( message:IPipeMessage, params:Object):IPipeMessage		
 		{
 			if (message.getHeader().logLevel > params.logLevel) { throw new Error(); }
+			return message;
 		}
 		
 	}

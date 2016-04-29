@@ -1,10 +1,10 @@
 package nest.services.worker.process
 {
-	import org.puremvc.as3.multicore.utilities.pipes.messages.Message;
+	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 
 	public final class WorkerTask
 	{
-		public function WorkerTask(id:int, data:Message = null)
+		public function WorkerTask(id:int, data:IPipeMessage = null)
 		{
 			this._data = data;
 			this._id = id;
@@ -20,9 +20,9 @@ package nest.services.worker.process
 		;
 
 		private var _id:int;
-		private var _data:Message;
+		private var _data:IPipeMessage;
 
 		public function get id():int { return _id; }
-		public function get data():Message { return _data; }
+		public function get data():IPipeMessage { return _data; }
 	}
 }

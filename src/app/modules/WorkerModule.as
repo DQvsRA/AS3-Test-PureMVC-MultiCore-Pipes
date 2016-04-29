@@ -23,10 +23,15 @@ package app.modules
 	
 	public class WorkerModule extends Sprite implements IPipeAware
 	{
-		static public const INCOMIMG_MESSAGE_CHANNEL	: String = "incomimgMessageChannel";
-		static public const OUTGOING_MESSAGE_CHANNEL	: String = "outgoingMessageChannel";
+		static private const 
+			NAME						: String = "worker.module"
+		,	INCOMIMG_MESSAGE_CHANNEL	: String = "incomimgMessageChannel"
+		,	OUTGOING_MESSAGE_CHANNEL	: String = "outgoingMessageChannel"
+		,	SHARE_DATA_PIPE				: String = "shareDataPipe"
+		;
 		
-		static public const SHARE_DATA_PIPE				: String = "shareDataPipe";
+		static public const DICONNECT_OUTPUT_PIPE		: String = "diconnectOutputPipe";
+		static public const DICONNECT_INPUT_PIPE		: String = "diconnectInputPipe";
 		
 		static public const CALCULATE_CIRCLE_BUTTON		: String = "calculateCircleSize";
 		static public const CALCULATE_MAIN_COLOR		: String = "calculateMainColor";
@@ -41,20 +46,32 @@ package app.modules
 		,	isBusy			: Boolean
 		;
 		
-		public var incomingMessageChannel:MessageChannel;
-		public var outgoingMessageChannel:MessageChannel;
+		public var 
+			incomingMessageChannel	: MessageChannel
+		,	outgoingMessageChannel	: MessageChannel
+		;
 		
-		protected var _worker  		: Worker;
-		protected var _shareable	: ByteArray;
+		private var 
+			_worker  	: Worker
+		,	_shareable	: ByteArray
+		;
 			
-		private const _tasksQueue:Vector.<WorkerTask> = new Vector.<WorkerTask>();
+		private const 
+			_tasksQueue:Vector.<WorkerTask> = new Vector.<WorkerTask>()
+		;
 		
+		/**
+		 * This object is the part of Master as well as the worker
+		 * It's a facade holder - entry point for worker application (like Main)
+		 */
 		public function WorkerModule(bytes:ByteArray = null)
 		{
 			this.facade = WorkerFacade.getInstance( moduleID );
 			
 			isSupported = Worker.isSupported;
 			isMaster = Worker.current.isPrimordial;
+			isReady = false;
+			isBusy = false;
 			
 			WorkerFacade(facade).isMaster = isMaster;
 			
@@ -65,7 +82,7 @@ package app.modules
 					const swf 		: ByteArray = DynamicSWF.fromClass(className, bytes);
 					
 					_worker = WorkerDomain.current.createWorker(swf, false);
-					_worker.addEventListener(Event.WORKER_STATE, MasterHanlder_WorkerState); 
+					_worker.addEventListener(Event.WORKER_STATE, MasterHanlder_WorkerState, false, 0, true); 
 					
 					incomingMessageChannel = Worker.current.createMessageChannel(_worker);
 					outgoingMessageChannel = _worker.createMessageChannel(Worker.current);
@@ -77,13 +94,11 @@ package app.modules
 					_shareable.shareable = true;
 					setSharedProperty(SHARE_DATA_PIPE, _shareable);
 					
+					// Because we cant run task before worker is being ready
+					// So we mark "task execution" as Busy to store all WorkerTasks in a Queue for later execution
 					isBusy = true;
 					
 					_worker.start();
-					
-//					if(NativeApplication) NativeApplication.nativeApplication.addEventListener(Event.DEACTIVATE, function(e:Event):void {
-//						_worker.terminate();
-//					}, false, 0, true);
 					
 				} else {
 					_worker = Worker.current;
@@ -94,8 +109,7 @@ package app.modules
 					_shareable = getSharedProperty(SHARE_DATA_PIPE);
 					_shareable.shareable = true;
 					
-					isBusy = false;
-					
+					// Worker don't need to wait, it's start immediately
 					Starting();
 				}
 			} else {
@@ -111,7 +125,6 @@ package app.modules
 		public function send(task:WorkerTask):void {
 		//==================================================================================================	
 //			trace("> WorkerModule -> SEND MESSAGE: M =", isMaster, task.id);
-			
 			if(isBusy) {
 				_tasksQueue.push(task);
 			} else {
@@ -120,17 +133,6 @@ package app.modules
 				outputChannel.send(task.id, 0);
 			}
 		}
-		
-		//==================================================================================================
-		private function MasterHanlder_WorkerState(e:Event):void {
-		//==================================================================================================
-//			trace("> WorkerModule -> MasterHanlder_WorkerState:", e.currentTarget.state == WorkerState.RUNNING, isReady);
-			switch(e.currentTarget.state) {
-				case WorkerState.RUNNING: Starting(); break;
-				case WorkerState.NEW: break;				
-				case WorkerState.TERMINATED: break;					
-			}
-		}		
 				
 		//==================================================================================================	
 		public function getSharedProperty(id:String):* {
@@ -142,10 +144,10 @@ package app.modules
 		public function completeTask():void {
 		//==================================================================================================	
 			isBusy = false;
-			trace("\n> COMPLETE TASK => TASK QUEUE:", isMaster, _tasksQueue.length);
+//			trace("\n> COMPLETE TASK => TASK QUEUE:", isMaster, _tasksQueue.length);
 			if(_tasksQueue.length) {
 				const task:WorkerTask = _tasksQueue.shift();
-				trace("\t\t : TASK:", JSON.stringify(task));
+//				trace("\t\t : TASK:", JSON.stringify(task));
 				this.send(task);
 			}
 		}
@@ -189,16 +191,26 @@ package app.modules
 			WorkerFacade(facade).startup( this );
 		}
 		
-		public function getID():String { return moduleID; }
-		private static function getNextID():String { return NAME + "." + serial++; }
-		private static const NAME:String = "worker.module"
-		private static var serial:Number = 0;
-		private const moduleID:String = WorkerModule.getNextID();
+		//==================================================================================================
+		private function MasterHanlder_WorkerState(e:Event):void {
+		//==================================================================================================
+//			trace("> WorkerModule -> MasterHanlder_WorkerState:", e.currentTarget.state == WorkerState.RUNNING, isReady);
+			switch(e.currentTarget.state) {
+				case WorkerState.RUNNING: Starting(); break;
+				case WorkerState.NEW: break;				
+				case WorkerState.TERMINATED: break;					
+			}
+		}	
 		
 		public function acceptInputPipe(name:String, pipe:IPipeFitting):void 
 		{ facade.sendNotification( JunctionMediator.ACCEPT_INPUT_PIPE, pipe, name ); }
 		public function acceptOutputPipe(name:String, pipe:IPipeFitting):void 
 		{ facade.sendNotification( JunctionMediator.ACCEPT_OUTPUT_PIPE, pipe, name ); }
 		protected var facade:IFacade;
+		
+		public function getID():String { return moduleID; }
+		private static function getNextID():String { return NAME + "." + serial++; }
+		private static var serial:Number = 0;
+		private const moduleID:String = WorkerModule.getNextID();
 	}
 }

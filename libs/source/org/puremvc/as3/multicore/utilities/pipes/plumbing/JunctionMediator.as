@@ -1,12 +1,5 @@
-/*
- PureMVC AS3/MultiCore Utility – Pipes
- Copyright (c) 2008 Cliff Hall<cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
-	import app.modules.worker.WorkerFacade;
-	
 	import org.puremvc.as3.multicore.interfaces.INotification;
 	import org.puremvc.as3.multicore.patterns.mediator.Mediator;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
@@ -66,45 +59,53 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		override public function handleNotification( note:INotification ):void
 		{
+			const connectionTeeName	: String = note.getType();
+			const pipeToConnect		: IPipeFitting = note.getBody() as IPipeFitting;
+			
 			switch( note.getName() )
 			{
 				// accept an input pipe
 				// register the pipe and if successful 
 				// set this mediator as its listener
 				case JunctionMediator.ACCEPT_INPUT_PIPE:
-					const inputPipeName	: String = note.getType();
-					const inputPipe		: IPipeFitting = note.getBody() as IPipeFitting;
-					
-					if(junction.hasInputPipe(inputPipeName)) {
-						trace("\t\t : ACCEPT_INPUT_PIPE =", inputPipeName);
-						const incomePipeIn	: IPipeFitting = note.getBody() as IPipeFitting;
-						const teeInput		: TeeMerge = junction.retrievePipe(inputPipeName) as TeeMerge;
-						trace("\t\t : Connect =", teeInput.pipeName, incomePipeIn);
-						teeInput.connectInput(incomePipeIn);	
-					} else {
-						if ( junction.registerPipe(inputPipeName, Junction.INPUT, inputPipe) ) 
-						{
-							junction.addPipeListener( inputPipeName, this, handlePipeMessage );		
-						} 
+//					trace("\t\t : ACCEPT_INPUT_PIPE =", connectionTeeName);
+					if(junction.hasInputPipe(connectionTeeName)) 
+					{
+						MergeInputPipeWithTee(pipeToConnect, connectionTeeName);
+					} 
+					else if(junction.registerPipe(connectionTeeName, Junction.INPUT, pipeToConnect))
+					{
+						junction.addPipeListener(connectionTeeName, this, handlePipeMessage);		
 					}
-					
-					
 					break;
 				
 				// accept an output pipe
 				case JunctionMediator.ACCEPT_OUTPUT_PIPE:
-					const outputPipeName:String = note.getType();
-					const outputPipe:IPipeFitting = note.getBody() as IPipeFitting;
-					trace("\t\t : ACCEPT_OUTPUT_PIPE =", outputPipeName);
-					if(junction.hasOutputPipe(outputPipeName)) {
-						const teeForOutput:IPipeFitting = junction.retrievePipe(outputPipeName) as IPipeFitting;
-						trace("\t\t : Connect =", teeForOutput.pipeName, outputPipe);
-						teeForOutput.connect(outputPipe);
+//					trace("\t\t : ACCEPT_OUTPUT_PIPE =", connectionTeeName);
+					if(junction.hasOutputPipe(connectionTeeName)) 
+					{
+						AddOutputChannelToTee(pipeToConnect, connectionTeeName);
 					} else {
-						junction.registerPipe( outputPipeName, Junction.OUTPUT, outputPipe );
+						junction.registerPipe( connectionTeeName, Junction.OUTPUT, pipeToConnect );
 					}
 					break;
 			}
+		}
+		
+		private function AddOutputChannelToTee(outputPipe:IPipeFitting, teeName:String):void
+		{
+			const teeForOutput:IPipeFitting = junction.retrievePipe(teeName) as IPipeFitting;
+			trace("\t\t : Connect =", teeForOutput.pipeName, outputPipe);
+			teeForOutput.connect(outputPipe);
+			trace(teeName, "TEE COUNT:", TeeSplit(teeForOutput).outputsCount());
+		}
+		
+		private function MergeInputPipeWithTee(inputPipe:IPipeFitting, teeName:String):void
+		{
+			const teeForInput : TeeMerge = junction.retrievePipe(teeName) as TeeMerge;
+			trace("\t\t : Connect =", teeForInput, inputPipe);
+			teeForInput.connectInput(inputPipe);
+			trace(teeName, "CHAIN LENGTH:", teeForInput.chainLength);
 		}
 		
 		/**

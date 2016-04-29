@@ -77,21 +77,23 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var outputMessage:IPipeMessage;
 			var success:Boolean = true;
 
+//			trace("FILTER WRITE:", message.getType() == Message.NORMAL);
+//			trace("\t\t : Mode:", mode === FilterControlMessage.FILTER);
+			
+			
 			// Filter normal messages
-			switch ( message.getType())
+			switch ( message.getType() )
 			{
 				case  Message.NORMAL: 	
-					try {
-						if ( mode == FilterControlMessage.FILTER ) {
-							outputMessage = applyFilter( message );
-						} else {
-							outputMessage = message;
-						}
-						success = output.write( outputMessage );
-					} catch (e:Error) {
-						success = false;
+					if ( mode == FilterControlMessage.FILTER ) {
+						outputMessage = applyFilter( message );
+					} else {
+						outputMessage = message;
 					}
-					break;
+//					trace("\t\t : Output:", output);
+//					trace("\t\t : outputMessage:", JSON.stringify(outputMessage));
+					success = output && outputMessage && output.write( outputMessage );
+				break;
 				
 				// Accept parameters from control message 
 				case FilterControlMessage.SET_PARAMS:
@@ -171,8 +173,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		protected function applyFilter( message:IPipeMessage ):IPipeMessage
 		{
-			filter.apply( this, [ message, params ] );
-			return message;
+			return filter(message, params);
 		}
 		
 		protected var mode:String = FilterControlMessage.FILTER;

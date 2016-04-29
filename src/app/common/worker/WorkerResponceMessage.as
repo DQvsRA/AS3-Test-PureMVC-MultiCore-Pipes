@@ -7,7 +7,7 @@ package app.common.worker
 	{
 		public function WorkerResponceMessage(responce:String = "", data:Object = null)
 		{
-			super(responce, null, data);
+			super(Message.NORMAL, responce, data);
 		}
 		
 		public function get data():Object
@@ -17,7 +17,7 @@ package app.common.worker
 		
 		public function get responce():String
 		{
-			return type;
+			return String(header);
 		}
 	}
 }

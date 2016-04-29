@@ -7,7 +7,8 @@ package app.common.worker
 	{
 		public function WorkerRequestMessage(request:String = "", data:Object = null, responce:Object = null )
 		{
-			super(request, responce, data);
+			const header:Object = { request:request, responce:responce };
+			super(Message.NORMAL, header, data);
 		}
 		
 		public function get data():Object
@@ -17,17 +18,17 @@ package app.common.worker
 		
 		public function get request():String
 		{
-			return type;
+			return header.request;
 		}
 		
-		public function get responce():String
+		public function get responce():*
 		{
-			return String(header);
+			return header.responce;
 		}
 		
 		public function set responce(value:String):void 
 		{
-			header = value;
+			header.responce = value;
 		}
 	}
 }

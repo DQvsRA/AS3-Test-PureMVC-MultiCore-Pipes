@@ -11,8 +11,8 @@ package app.main.controller.modules
     {
         override public function execute(note:INotification):void
         {
-			trace("\n> CircleMaker : ModuleCreateCommand");
-			var circleMaker:CircleMakerModule = new CircleMakerModule();
+//			trace("\n> CircleMaker : ModuleCreateCommand");
+			const circleMaker:CircleMakerModule = new CircleMakerModule();
    			sendNotification(MainFacade.CONNECT_MODULE_TO_LOGGER, 	circleMaker );
    			sendNotification(MainFacade.CONNECT_MODULE_TO_MAIN, 	circleMaker );
    			sendNotification(MainFacade.CONNECT_MODULE_TO_WORKER, 	circleMaker );

@@ -45,7 +45,7 @@ package app.main.view.modules
 			switch( note.getName() )
 			{
 				case  MainFacade.CONNECT_MODULE_TO_WORKER:
-					trace("\n> WorkerModuleMediator : MainFacade.CONNECT_MODULE_TO_WORKER", note.getBody());
+//					trace("\n> WorkerModuleMediator : MainFacade.CONNECT_MODULE_TO_WORKER", note.getBody());
 
 					const workerOutPipe	: Pipe = new Pipe();
 					const workerInPipe	: Pipe = new Pipe();
@@ -61,7 +61,7 @@ package app.main.view.modules
 
 				// Bidirectionally connect main and worker on TOWRK/STDMAIN
 				case  MainFacade.CONNECT_MAIN_TO_WORKER:
-					trace("\n> WorkerModuleMediator : MainFacade.CONNECT_MAIN_TO_WORKER")
+//					trace("\n> WorkerModuleMediator : MainFacade.CONNECT_MAIN_TO_WORKER")
 					// The junction was passed from MainJunctionMediator
 					const wrkToMain		: Pipe 			= new Pipe();
 					const mainJunction	: Junction 		= note.getBody() as Junction;

@@ -5,6 +5,8 @@
  */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
+	import flash.utils.getTimer;
+	
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 
@@ -17,9 +19,15 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	 */	
 	public class Pipe implements IPipeFitting
 	{
-		protected var output:IPipeFitting;
-		private var _pipeName:String;
+		public var chainLength:uint = 0;
+		
+		private var
+			_id			: uint = getTimer()
+		,	_pipeName	: String
+		;
 
+		protected var output:IPipeFitting;
+		
 		public function Pipe( output:IPipeFitting = null )
 		{
 			if (output) connect(output);
@@ -40,6 +48,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 				output.pipeName = this.pipeName;
 				this.output = output;
 				success = true;
+				chainLength++;
 			}
 			return success;
 		}
@@ -56,9 +65,9 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 * 
 		 * @return IPipeFitting the now disconnected output fitting
 		 */
-		public function disconnect(  ) : IPipeFitting
+		public function disconnect( ) : IPipeFitting
 		{
-			var disconnectedFitting:IPipeFitting = this.output;
+			const disconnectedFitting:IPipeFitting = this.output;
 			this.output = null;
 			return disconnectedFitting;
 		}
@@ -77,6 +86,10 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		public function get pipeName():String { return _pipeName; }
 
 		public function set pipeName(value:String):void { _pipeName = value; }
+
+		public function get id():uint { return _id; }
+
+		public function set id(value:uint):void { _id = value; }
 
 		
 	}

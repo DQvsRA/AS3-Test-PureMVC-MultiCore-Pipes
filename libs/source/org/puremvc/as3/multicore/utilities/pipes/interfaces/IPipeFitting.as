@@ -60,6 +60,9 @@ package org.puremvc.as3.multicore.utilities.pipes.interfaces
 		function write( message:IPipeMessage ):Boolean;
 
 		function get pipeName():String;		
-		function set pipeName(value:String):void;		
+		function set pipeName(value:String):void;	
+		
+		function set id(value:uint):void;
+		function get id():uint;
 	}
 }

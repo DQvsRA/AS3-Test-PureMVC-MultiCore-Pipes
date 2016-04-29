@@ -29,7 +29,7 @@ package app.modules.worker.controller
 			if(!workerModule.isMaster || !workerModule.isSupported) {
 				facade.registerCommand( WorkerFacade.CMD_CALCULATE_MAIN_COLOR, 		CalculateMainColorCommand );
 				facade.registerCommand( WorkerFacade.CMD_CALCULATE_CIRCLE_BUTTON,	CalculateCircleButtonCommand );
-				facade.registerCommand( WorkerFacade.CMD_CALCULATE_LOG_SIZE,			CalculateLogSizeCommand );
+				facade.registerCommand( WorkerFacade.CMD_CALCULATE_LOG_SIZE,		CalculateLogSizeCommand );
 			}
 			
 			facade.registerMediator( new WorkerJunctionMediator(workerProcessor) );

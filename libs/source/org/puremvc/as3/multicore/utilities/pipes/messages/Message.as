@@ -44,6 +44,9 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 
 		// Body of the message is the precious cargo
 		public var body:Object;
+		
+		// This is from where this messege is comming from
+		public var pipeID:uint;
 
 		// Constructor
 		public function Message( type:String, header:Object=null, body:Object=null, priority:int=5 )

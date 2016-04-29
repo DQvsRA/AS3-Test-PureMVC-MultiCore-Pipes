@@ -45,6 +45,5 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		{
 			return input.connect(this);
 		}
-		
 	}
 }

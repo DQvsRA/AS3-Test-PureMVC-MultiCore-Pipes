@@ -59,10 +59,10 @@ package app.main.view
 		
 		private function handleWorkerPipeMessage(message:IPipeMessage):void
 		{
-			trace("> MainJunctionMediator.handleWorkerPipeMessage:\n" + JSON.stringify(message) + "\n");
+//			trace("> MainJunctionMediator.handleWorkerPipeMessage:\n" + JSON.stringify(message) + "\n");
 			if ( message is WorkerResponceMessage ) 
 			{
-				switch ( WorkerResponceMessage(message).getType() ) 
+				switch ( WorkerResponceMessage(message).responce ) 
 				{
 					case WorkerModule.MESSAGE_TO_MAIN_SET_COLOR:
 						const color:uint = uint(WorkerResponceMessage(message).data);
@@ -96,17 +96,18 @@ package app.main.view
 			switch( note.getName() )
 			{
 				case MainFacade.GET_MODULE_LOGGER:
-					trace("\t\t : MainFacade.GET_MODULE_LOGGER")
+//					trace("\t\t : MainFacade.GET_MODULE_LOGGER")
 					junction.sendMessage( PipeAwareModule.STDLOG, new UIQueryMessage(UIQueryMessage.GET, LoggerModule.GET_LOG_UI));
 					break;
 				case MainFacade.WORKER_GET_MAIN_COLOR:
-					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, WorkerModule.MESSAGE_TO_MAIN_SET_COLOR	));
-//					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, function(data:WorkerResponceMessage):void{
+//					trace("\t\t : MainFacade.WORKER_GET_MAIN_COLOR")
+//					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, WorkerModule.MESSAGE_TO_MAIN_SET_COLOR	));
+					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, function(data:WorkerResponceMessage):void{
 //						trace(">>>>> RECEIVED COLOR: " + data);
-//						const color:uint = uint(data.data);
-//						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
-//						junction.sendMessage( PipeAwareModule.STDLOG, new LogMessage( 0, this.multitonKey, "Color received by main: " + color) );
-//					}));
+						const color:uint = uint(data.data);
+						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
+						junction.sendMessage( PipeAwareModule.STDLOG, new LogMessage( 0, multitonKey , "Color received by main: " + color) );
+					}));
 					break;
 				case  MainFacade.CONNECT_MODULE_TO_MAIN:
 					// Connect a module's STDSHELL to the shell's STDIN
@@ -138,7 +139,7 @@ package app.main.view
 		
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-			trace("MainJunction.handlePipeMessage:", message);
+//			trace("MainJunction.handlePipeMessage:", message);
 			if ( message is UIQueryMessage )
 			{
 				switch ( UIQueryMessage(message).name )
