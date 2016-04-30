@@ -1,6 +1,5 @@
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
-	import flash.utils.getTimer;
 	
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
@@ -14,7 +13,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	{
 		private var 
 			_outputs	: Array = new Array()
-		,	_id			: uint = getTimer()
+		,	_id			: uint = Pipe.getID()
 		,	_pipeName	: String
 		;
 		/**
@@ -73,17 +72,21 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		public function disconnectFitting( target:IPipeFitting ):IPipeFitting 
 		{
-			var removed:IPipeFitting;
-			var output:IPipeFitting;
-			var length:uint = _outputs.length;
+			var removed	: IPipeFitting;
+			var output	: IPipeFitting;
+			var length	: uint = _outputs.length;
+//			trace("> TeeSplit.disconnectFitting, target.id =", target.id);
+//			trace("> TeeSplit.disconnectFitting, target.pipe =", target.pipeName);
+//			trace("> TeeSplit.disconnectFitting, length =", length);
 			while(length--) {
 				output = _outputs[length];
+//				trace(">\t\t output :", output.id, output.pipeName);
 				if (output.id === target.id) {
-					removed = _outputs.removeAt(length);
-					trace("disconnectFitting", removed);
+					removed = _outputs.removeAt(length - 1);
 					break;
 				}
 			}
+//			trace("> TeeSplit.disconnectFitting, removed =", removed);
 			return removed;
 		}
 		

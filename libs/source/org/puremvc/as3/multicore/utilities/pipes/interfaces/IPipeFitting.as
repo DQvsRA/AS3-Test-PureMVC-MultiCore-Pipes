@@ -16,7 +16,7 @@ package org.puremvc.as3.multicore.utilities.pipes.interfaces
 	 * the next.</P>
 	 */
 	public interface IPipeFitting
-	{
+	{	
 		/**
 		 * Connect another Pipe Fitting to the output.
 		 * <P>
@@ -58,7 +58,7 @@ package org.puremvc.as3.multicore.utilities.pipes.interfaces
 	 	 * rolling back changes.</P>
 	 	 */
 		function write( message:IPipeMessage ):Boolean;
-
+		
 		function get pipeName():String;		
 		function set pipeName(value:String):void;	
 		

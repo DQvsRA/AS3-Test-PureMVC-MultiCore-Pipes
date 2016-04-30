@@ -12,7 +12,8 @@ package app.modules.circlebutton.controller
     {
         override public function execute(note:INotification):void
         {
-        	trace("> CircleMaker : StartupCommand");
+        	trace("========================================================");
+			trace("> CircleMaker : StartupCommand");
        		facade.registerProxy( new CircleButtonProxy( ) );
        		facade.registerMediator( new CircleButtonJunctionMediator( ) );
        		facade.registerMediator( new CircleButtonMediator( new CircleButton() ) );

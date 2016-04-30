@@ -19,5 +19,10 @@ package app.common.worker
 		{
 			return String(header);
 		}
+		
+		public function set responce(value:String):void
+		{
+			header = value;
+		}
 	}
 }

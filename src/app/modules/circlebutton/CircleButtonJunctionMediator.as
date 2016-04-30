@@ -81,7 +81,7 @@ package app.modules.circlebutton
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-//			trace("> CircleMaker : Junction.handlePipeMessage:\n", JSON.stringify(message) + "\n");
+			trace("> CircleButtonJunctionMediator : handlePipeMessage:", JSON.stringify(message) + "\n");
 			if(message is WorkerResponceMessage) {
 				switch(WorkerResponceMessage(message).responce)
 				{
@@ -100,7 +100,7 @@ package app.modules.circlebutton
 			const workerInputPipe:IPipeFitting = junction.retrievePipe( PipeAwareModule.FROMWRK );
 			if(workerInputPipe) {
 				junction.sendMessage( PipeAwareModule.TOWRK, 
-					new WorkerRequestMessage(WorkerModule.DICONNECT_INPUT_PIPE, 
+					new WorkerRequestMessage(WorkerModule.DICONNECT_OUTPUT_PIPE, 
 						workerInputPipe, function(responce:WorkerResponceMessage):void {
 //							trace("===== DISCONNECTED INPUT =====");
 							junction.removePipe( PipeAwareModule.FROMWRK );
@@ -111,7 +111,7 @@ package app.modules.circlebutton
 			const workerOutputPipe:IPipeFitting = junction.retrievePipe( PipeAwareModule.TOWRK );
 			if(workerOutputPipe) {
 				junction.sendMessage( PipeAwareModule.TOWRK, 
-					new WorkerRequestMessage(WorkerModule.DICONNECT_OUTPUT_PIPE, 
+					new WorkerRequestMessage(WorkerModule.DICONNECT_INPUT_PIPE, 
 						workerOutputPipe, function(responce:WorkerResponceMessage):void{
 //							trace("===== DISCONNECTED OUTPUT =====");
 							junction.removePipe( PipeAwareModule.TOWRK );

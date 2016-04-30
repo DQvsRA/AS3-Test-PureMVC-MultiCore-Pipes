@@ -15,7 +15,7 @@ package app.modules.worker.controller.commands
 	{
 		override public function execute( note:INotification ):void 
 		{
-			trace("CalculateCircleButtonCommand", note.getType());
+//			trace("CalculateCircleButtonCommand", note.getType());
 			const outputParameters:Object = {
 				size		: Math.random() * 20 + 20,
 				upColor 	: Math.random()*0xffffff, 

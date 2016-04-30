@@ -113,7 +113,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var message:IPipeMessage = messages.shift() as IPipeMessage;
 			while ( message != null ) 
 			{
-				var ok:Boolean = output.write( message );
+				var ok:Boolean = _output.write( message );
 				if ( !ok ) success = false;
 				message = messages.shift() as IPipeMessage;
 			} 

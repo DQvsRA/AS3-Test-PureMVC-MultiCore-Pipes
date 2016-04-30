@@ -7,6 +7,8 @@ package app.main.view
 	
 	import app.main.MainFacade;
 	
+	import nest.services.worker.thread.Thread;
+	
 	import org.puremvc.as3.multicore.interfaces.INotification;
 	import org.puremvc.as3.multicore.patterns.mediator.Mediator;
 	
@@ -38,6 +40,20 @@ package app.main.view
 				}
 				case Keyboard.NUMBER_0: {
 					facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );
+					break;	
+				}
+				case Keyboard.S: {
+					var thread:Thread = new Thread(100);
+					
+					for (var i:int = 0; i < 1000; i++) 
+					{
+						thread.add(function():void{
+//							facade.sendNotification( MainFacade.CREATE_MODULE_CIRCLE_MAKER );
+							facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );
+						});
+					}
+					thread.execute();
+											
 					break;	
 				}
 			}

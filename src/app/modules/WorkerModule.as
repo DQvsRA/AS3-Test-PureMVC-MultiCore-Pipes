@@ -68,7 +68,7 @@ package app.modules
 		{
 			this.facade = WorkerFacade.getInstance( moduleID );
 			
-			isSupported = Worker.isSupported;
+			isSupported = false;//Worker.isSupported;
 			isMaster = Worker.current.isPrimordial;
 			isReady = false;
 			isBusy = false;

@@ -1,11 +1,9 @@
-/*
- PureMVC AS3/MultiCore Utility – Pipes
- Copyright (c) 2008 Cliff Hall<cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package org.puremvc.as3.multicore.utilities.pipes.messages
 {
+	import mx.utils.UIDUtil;
+	
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
+
 	/**
 	 * Pipe Message.
 	 * <P>
@@ -48,6 +46,8 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 		// This is from where this messege is comming from
 		public var pipeID:uint;
 
+		public var uid:String;
+
 		// Constructor
 		public function Message( type:String, header:Object=null, body:Object=null, priority:int=5 )
 		{
@@ -55,6 +55,7 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 			setHeader( header );
 			setBody( body );
 			setPriority( priority );
+			uid = UIDUtil.createUID();
 		}
 		
 		// Get the type of this message
@@ -105,5 +106,19 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 			this.body = body;
 		}
 
+		public function getPipeID():uint 
+		{ 
+			return pipeID;
+		}
+		
+		public function setPipeID(value:uint):void 
+		{ 
+			pipeID = value;
+		}
+		
+		public function getUID():String 
+		{ 
+			return uid;
+		}
 	}
 }

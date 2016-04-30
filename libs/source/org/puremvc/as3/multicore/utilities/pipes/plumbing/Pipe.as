@@ -5,11 +5,9 @@
  */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
-	import flash.utils.getTimer;
-	
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
-
+	
 	/**
 	 * Pipe.
 	 * <P>
@@ -19,10 +17,13 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	 */	
 	public class Pipe implements IPipeFitting
 	{
+		private static var serial:Number = 1;
+		public static function getID():uint { return serial++; }
+		
 		public var chainLength:uint = 0;
 		
 		private var
-			_id			: uint = getTimer()
+			_id			: uint = Pipe.getID()
 		,	_pipeName	: String
 		;
 
@@ -90,7 +91,5 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		public function get id():uint { return _id; }
 
 		public function set id(value:uint):void { _id = value; }
-
-		
 	}
 }

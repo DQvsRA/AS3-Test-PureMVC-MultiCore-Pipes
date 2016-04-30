@@ -155,7 +155,14 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		public function retrievePipe( name:String ):IPipeFitting 
 		{
-			return pipesMap[name]  as IPipeFitting;
+			const original:IPipeFitting = pipesMap[name];
+			var result:IPipeFitting = original;
+			var isFilter:Boolean = result is Filter;
+			while(result && isFilter) {
+				result = Filter(result).getOutput();
+				isFilter = result is Filter;
+			}
+			return result || original;
 		}
 
 		/**
@@ -186,12 +193,13 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 * @param name the OUTPUT pipe to send the message on
 		 * @param message the IPipeMessage to send  
 		 */
-		public function sendMessage( outputPipeName:String, message:IPipeMessage ):Boolean 
+		public function sendMessage( outputPipeName:String, message:IPipeMessage, individual:Boolean = true ):Boolean 
 		{
 			var success:Boolean = false;
 			if ( hasOutputPipe(outputPipeName) )
 			{
 				const pipe:IPipeFitting = pipesMap[outputPipeName] as IPipeFitting;
+				if(individual && !message.getPipeID()) message.setPipeID(pipe.id);
 				success = pipe.write(message);
 			} 
 			return success;

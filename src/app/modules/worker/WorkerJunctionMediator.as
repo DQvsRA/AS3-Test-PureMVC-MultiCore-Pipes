@@ -1,9 +1,6 @@
 
 package app.modules.worker
 {
-	import flash.system.Worker;
-	import flash.system.WorkerDomain;
-	
 	import app.common.PipeAwareModule;
 	import app.common.worker.WorkerJunction;
 	import app.common.worker.WorkerRequestMessage;
@@ -11,6 +8,7 @@ package app.modules.worker
 	import app.modules.WorkerModule;
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
+	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.Filter;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.Junction;
@@ -34,18 +32,17 @@ package app.modules.worker
 		
 		override public function onRegister():void
 		{
-			const workerNotSupported:Boolean = !workerJunction.isSupported// || (WorkerDomain.isSupported && Worker.current.isPrimordial)
-			
+			const workerNotSupported:Boolean = !workerJunction.isSupported;
 //			trace("> WorkerJunction : PipeAwareModule.WRKOUT =", junction.hasPipe(PipeAwareModule.WRKOUT))
 			if (!junction.hasPipe(PipeAwareModule.WRKOUT)) {
 				// The WRKOUT pipe from the worker to all modules or main
-				const teeOut:TeeSplit = new TeeSplit();
+				var teeOut:IPipeFitting = new TeeSplit();
 				if(workerNotSupported) {
 					const filter:Filter = new Filter( 
-						WorkerJunction.FILTER_FOR_APPLY_RESPONCE_FUNCTION, null, 
-						workerJunction.filter_ApplyResponceFunction as Function
+						WorkerJunction.FILTER_FOR_APPLY_RESPONCE, teeOut, 
+						workerJunction.filter_ApplyMessageResponce as Function
 					);
-					teeOut.connect(filter);
+					teeOut = filter as IPipeFitting;
 				}
 				junction.registerPipe( PipeAwareModule.WRKOUT, Junction.OUTPUT, teeOut );
 			}
@@ -64,10 +61,9 @@ package app.modules.worker
 						workerJunction.filter_DisconnectModule
 					);
 					diconectFilter.connect(new PipeListener(this, handlePipeMessage));
-					
 					const responceFilter:Filter = new Filter( 
-						WorkerJunction.FILTER_FOR_STORE_RESPONCE_FUNCTION, diconectFilter, 
-						workerJunction.filter_KeepResponceFunction as Function
+						WorkerJunction.FILTER_FOR_STORE_RESPONCE, diconectFilter, 
+						workerJunction.filter_KeepMessageResponce as Function
 					);
 					teeMerge.connect(responceFilter);
 				} 
@@ -116,7 +112,7 @@ package app.modules.worker
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-			trace("\nWorkerJunctionMediator.handlePipeMessage:\n", JSON.stringify(message));
+			trace("WorkerJunctionMediator.handlePipeMessage:", JSON.stringify(message));
 			
 			if(message is WorkerRequestMessage) {
 				

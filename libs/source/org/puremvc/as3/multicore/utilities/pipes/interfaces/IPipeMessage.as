@@ -40,5 +40,14 @@ package org.puremvc.as3.multicore.utilities.pipes.interfaces
 
 		// Set the body of this message
 		function setBody(body:Object):void;
+		
+		// Get the pipe id from where this message is comming from
+		function getPipeID():uint;
+		
+		// Set the pipe id for that message
+		function setPipeID(value:uint):void;
+		
+		// Get the message unique id 
+		function getUID():String;
 	}
 }

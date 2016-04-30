@@ -33,7 +33,12 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			if ( filter != null ) setFilter( filter );
 			if ( params != null ) setParams( params );
 		}
-
+		
+		public function getOutput():IPipeFitting 
+		{
+			return this.output;
+		}
+		
 		/**
 		 * Handle the incoming message.
 		 * <P>
@@ -90,8 +95,8 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 					} else {
 						outputMessage = message;
 					}
-//					trace("\t\t : Output:", output);
-//					trace("\t\t : outputMessage:", JSON.stringify(outputMessage));
+//					trace("> FILTER\t\t : Output:", output);
+//					trace("> FILTER\t\t : outputMessage:", JSON.stringify(outputMessage));
 					success = output && outputMessage && output.write( outputMessage );
 				break;
 				

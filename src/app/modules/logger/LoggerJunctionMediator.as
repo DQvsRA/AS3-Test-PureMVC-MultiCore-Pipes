@@ -54,7 +54,7 @@ package app.modules.logger
 		
 		private function handleWorkerPipeMessage(message:IPipeMessage):void
 		{
-			trace("> LoggerJunctionMediator.handleWorkerPipeMessage:\n" + JSON.stringify(message) + "\n");
+			trace("\n> LoggerJunctionMediator.handleWorkerPipeMessage:" + JSON.stringify(message) + "\n");
 		}
 		
 		override public function listNotificationInterests():Array

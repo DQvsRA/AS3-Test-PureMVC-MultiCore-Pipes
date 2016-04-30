@@ -7,8 +7,6 @@ package app.common.worker
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 	
-	import mx.utils.UIDUtil;
-	
 	import app.common.PipeAwareModule;
 	import app.modules.WorkerModule;
 	
@@ -24,13 +22,13 @@ package app.common.worker
 
 	public final class WorkerJunction extends Junction
 	{
-		static public const FILTER_FOR_DISCONNECT_MODULE			: String = "pipeFilterDiconnectMessage";
-		static public const FILTER_FOR_STORE_RESPONCE_FUNCTION		: String = "pipeFilterInputMessage";
-		static public const FILTER_FOR_APPLY_RESPONCE_FUNCTION		: String = "pipeFilterOutputMessage";
+		static public const FILTER_FOR_DISCONNECT_MODULE	: String = "pipeFilterDiconnectMessage";
+		static public const FILTER_FOR_STORE_RESPONCE		: String = "pipeFilterInputMessage";
+		static public const FILTER_FOR_APPLY_RESPONCE		: String = "pipeFilterOutputMessage";
 		
 		public var isSupported:Boolean = false;
 		
-		private const _responceFunctions:Dictionary = new Dictionary(true);
+		private const _responces:Dictionary = new Dictionary(true);
 		
 		{
 			registerClassAlias(getQualifiedClassName(WorkerRequestMessage), 		WorkerRequestMessage );
@@ -58,8 +56,8 @@ package app.common.worker
 						})
 					);
 					const requestFilter:Filter = new Filter( 
-						FILTER_FOR_STORE_RESPONCE_FUNCTION, diconectFilter, 
-						filter_KeepResponceFunction as Function
+						FILTER_FOR_STORE_RESPONCE, diconectFilter, 
+						filter_KeepMessageResponce as Function
 					);
 					teeMerge.connect(requestFilter);
 					this.registerPipe( PipeAwareModule.WRKIN,  Junction.INPUT, teeMerge );
@@ -94,7 +92,7 @@ package app.common.worker
 							{
 								case WorkerTask.READY: __ready(); break;
 								case WorkerTask.MESSAGE: {
-									if(__isMaster && !filter_ApplyResponceFunction(responce as WorkerResponceMessage)) {
+									if(__isMaster && !filter_ApplyMessageResponce(responce as WorkerResponceMessage)) {
 										break;
 									}
 									(__getPipe(__channel) as IPipeFitting).write(responce);
@@ -117,10 +115,12 @@ package app.common.worker
 			{
 				case WorkerModule.DICONNECT_INPUT_PIPE:
 				{
-//					trace("> filterDisconnectOutput, DISCONNECT_OUTPUT_PIPE");
+//					trace("> filterDisconnectOutput, DISCONNECT_INPUT_PIPE");
 					disconnected = message.data as IPipeFitting;
-					disconnected.disconnect();
-					filter_ApplyResponceFunction(new WorkerResponceMessage(message.responce));
+//					trace("\t\t: pipeNane:", disconnected.pipeName);
+//					trace("\t\t: id:", disconnected.id);
+					if(disconnected) disconnected.disconnect();
+					filter_ApplyMessageResponce(new WorkerResponceMessage(message.responce));
 					return null;
 				}
 				case WorkerModule.DICONNECT_OUTPUT_PIPE:
@@ -129,10 +129,12 @@ package app.common.worker
 					const teeSplit:TeeSplit = this.retrievePipe(PipeAwareModule.WRKOUT) as TeeSplit;
 					if(teeSplit) {
 						disconnected = message.data as IPipeFitting;
-						disconnected.disconnect();
+//						trace(disconnected.pipeName);
+						if(disconnected) disconnected.disconnect();
 						disconnected = teeSplit.disconnectFitting(disconnected);
-						disconnected.disconnect();
-						filter_ApplyResponceFunction(new WorkerResponceMessage(message.responce));
+//						trace(disconnected);
+						if(disconnected) disconnected.disconnect();
+						filter_ApplyMessageResponce(new WorkerResponceMessage(message.responce));
 					}
 					return null;
 				}
@@ -140,27 +142,38 @@ package app.common.worker
 			return message;
 		}
 		
-		public function filter_ApplyResponceFunction(message:WorkerResponceMessage, params:Object = null):IPipeMessage {
-//			trace("> filterApplyFunctionResponce", Worker.current.isPrimordial, JSON.stringify(message));
-			const taskResponceID:String = message.responce;
-			const taskResponce:Function = _responceFunctions[taskResponceID];
-//			trace("\t\t : taskResponce =", taskResponce);
-			if(taskResponce) {
-				delete _responceFunctions[taskResponceID];
-				taskResponce(message);
-				return null;
+		public function filter_ApplyMessageResponce(message:WorkerResponceMessage, params:Object = null):IPipeMessage {
+//			trace("> filterApplyFunctionResponce", JSON.stringify(message));
+			const responceMsgID:String = message.responce;
+			const msgResponce:MessageResponce = _responces[responceMsgID];
+			
+			if(msgResponce) {
+				const responce:* = msgResponce.responce;
+//				trace("\t\t : taskResponce =", responce);
+				
+				if(responce is Function) 
+				{
+					responce(message);
+					message = null;
+				} 
+				else if(responce is String) 
+				{
+					message.responce = String(responce);
+					message.setPipeID(msgResponce.pipeID);
+				}
+				delete _responces[responceMsgID];
 			}
+			
 			return message;
 		}
 		
-		public function filter_KeepResponceFunction(message:WorkerRequestMessage, params:Object = null):IPipeMessage {
+		public function filter_KeepMessageResponce(message:WorkerRequestMessage, params:Object = null):IPipeMessage {
 //			trace("> filterKeepResponceFunction", message);
-			const responce:* = message.responce;
-			if(responce is Function) {
-				const responceTaskID:String = UIDUtil.createUID(); // getTimer().toString();
-				_responceFunctions[responceTaskID] = responce;
-				message.responce = responceTaskID;
-			}
+			const responceMsgID:String = message.getUID(); //UIDUtil.createUID();
+			
+			_responces[responceMsgID] = new MessageResponce(message.responce, message.getPipeID());
+			message.responce = responceMsgID;
+			
 			return message;
 		}
 	}

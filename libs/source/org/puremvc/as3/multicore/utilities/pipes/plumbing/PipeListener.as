@@ -1,7 +1,5 @@
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
-	import flash.utils.getTimer;
-	
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 		
@@ -18,7 +16,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		private var context:Object;
 		private var listener:Function;
 		private var _pipeName:String;
-		private var _id:uint = getTimer();
+		private var _id:uint = Pipe.getID();
 		
 		public function PipeListener( context:Object, listener:Function )
 		{
@@ -54,7 +52,5 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 
 		public function get id():uint { return _id; }
 		public function set id(value:uint):void { _id = value; }
-
-
 	}
 }
