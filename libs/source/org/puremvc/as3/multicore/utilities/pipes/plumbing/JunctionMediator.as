@@ -95,17 +95,17 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		private function AddOutputChannelToTee(outputPipe:IPipeFitting, teeName:String):void
 		{
 			const teeForOutput:IPipeFitting = junction.retrievePipe(teeName) as IPipeFitting;
-			trace("\t\t : Connect =", teeForOutput.pipeName, outputPipe);
+//			trace("\t\t : Connect =", teeForOutput.pipeName, outputPipe);
 			teeForOutput.connect(outputPipe);
-			trace(teeName, "TEE COUNT:", TeeSplit(teeForOutput).outputsCount());
+//			trace(teeName, "TEE COUNT:", TeeSplit(teeForOutput).outputsCount());
 		}
 		
 		private function MergeInputPipeWithTee(inputPipe:IPipeFitting, teeName:String):void
 		{
 			const teeForInput : TeeMerge = junction.retrievePipe(teeName) as TeeMerge;
-			trace("\t\t : Connect =", teeForInput, inputPipe);
+//			trace("\t\t : Connect =", teeForInput, inputPipe);
 			teeForInput.connectInput(inputPipe);
-			trace(teeName, "CHAIN LENGTH:", teeForInput.chainLength);
+//			trace(teeName, "CHAIN LENGTH:", teeForInput.chainLength);
 		}
 		
 		/**

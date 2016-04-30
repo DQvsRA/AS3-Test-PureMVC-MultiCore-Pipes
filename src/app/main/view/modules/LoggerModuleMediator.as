@@ -54,30 +54,33 @@ package app.main.view.modules
 			{
 				// Connect any Module's STDLOG to the logger's STDIN
 				case  MainFacade.CONNECT_MODULE_TO_LOGGER:
-					
-					const pipe:Pipe = new Pipe();
-					const module:IPipeAware = note.getBody() as IPipeAware;
+				{	
+					const module	: IPipeAware = note.getBody() as IPipeAware;
+					const pipe		: Pipe = new Pipe(Pipe.newChannelID());
 					
 					module.acceptOutputPipe( PipeAwareModule.STDLOG, pipe );
 					logger.acceptInputPipe( PipeAwareModule.STDIN, pipe );
 					
 					break;
-
+				}
 				// Bidirectionally connect shell and logger on STDLOG/STDSHELL
-				case  MainFacade.CONNECT_MAIN_TO_LOGGER:
+				case  MainFacade.CONNECT_MAIN_TO_LOGGER: 
+				{
 					trace("\n> LoggerModuleMediator : MainFacade.CONNECT_MAIN_TO_LOGGER");
 					// The junction was passed from MainJunctionMediator
-					const mainJunction:Junction = note.getBody() as Junction;
-					// Connect the main's STDLOG to the logger's STDIN
-					const mainToLog:IPipeFitting = mainJunction.retrievePipe(PipeAwareModule.STDLOG);
-					logger.acceptInputPipe(PipeAwareModule.STDIN, mainToLog);
+					const mainJunction	: Junction 		= note.getBody() as Junction;
+					const mainInputTee	: TeeMerge 		= mainJunction.retrievePipe(PipeAwareModule.STDIN) as TeeMerge;
+					const mainToLogPipe	: IPipeFitting 	= mainJunction.retrievePipe(PipeAwareModule.STDLOG);
 					
-					// Connect the logger's STDMAIN to the shell's STDIN
-					const logToMain:Pipe = new Pipe();
-					const mainInput:TeeMerge = mainJunction.retrievePipe(PipeAwareModule.STDIN) as TeeMerge;
-					mainInput.connectInput(logToMain);
-					logger.acceptOutputPipe( PipeAwareModule.STDMAIN, logToMain );
+					const logToMainPipe	: Pipe = new Pipe(mainToLogPipe.channelID);
+					
+					logger.acceptInputPipe( PipeAwareModule.STDIN, mainToLogPipe );
+					logger.acceptOutputPipe( PipeAwareModule.STDMAIN, logToMainPipe );
+					
+					mainInputTee.connectInput(logToMainPipe);
+					
 					break;
+				}
 			}
 		}
 		

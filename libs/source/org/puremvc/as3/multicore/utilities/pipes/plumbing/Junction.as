@@ -1,8 +1,3 @@
-/*
- PureMVC AS3/MultiCore Utility – Pipes
- Copyright (c) 2008 Cliff Hall<cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
@@ -41,6 +36,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		// Constructor. 
 		public function Junction( )
 		{
+			
 		}
 
 		/**
@@ -59,24 +55,16 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		public function registerPipe( name:String, type:String, pipe:IPipeFitting ):Boolean
 		{ 
 			var success:Boolean = true;
-			if ( pipesMap[name] == null )
-			{
+			if ( pipesMap[name] == null ) {
 				pipe.pipeName = name;
 				pipesMap[name] = pipe;
 				pipeTypesMap[name] = type;
 				switch (type) {
-					case INPUT:
-						inputPipes.push(name);	
-						break;						
-					case OUTPUT:
-						outputPipes.push(name);	
-						break;					
-					default:	
-						success = false;
+					case INPUT: 	inputPipes.push(name);	 	break;						
+					case OUTPUT: 	outputPipes.push(name); 	break;					
+					default: success = false;
 				}
-			} else {
-				success = false;
-			}
+			} else success = false;
 			return success;
 		}
 		
@@ -129,16 +117,15 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 				const type:String = pipeTypesMap[name];
 				var pipesList:Array;
 				switch (type) {
-					case INPUT:
-						pipesList = inputPipes;
-						break;						
-					case OUTPUT:
-						pipesList = outputPipes;	
-						break;					
+					case INPUT: pipesList = inputPipes; break;						
+					case OUTPUT: pipesList = outputPipes; break;					
 				}
-				for (var i:int=0;i<pipesList.length;i++){
-					if (pipesList[i] == name){
-						pipesList.splice(i, 1);
+				var counter:uint = pipesList.length;
+				var pipeName:String;
+				while(counter--) {
+					pipeName = pipesList[counter]; 
+					if (pipeName == name){
+						pipesList.removeAt(counter);
 						break;
 					}
 				}
@@ -192,16 +179,19 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 * 
 		 * @param name the OUTPUT pipe to send the message on
 		 * @param message the IPipeMessage to send  
+		 * @param individual message will be send only to pipe from where this message is comming from, by channelID
 		 */
 		public function sendMessage( outputPipeName:String, message:IPipeMessage, individual:Boolean = true ):Boolean 
 		{
 			var success:Boolean = false;
+			trace(">\tJunction.sendMessage: hasOutputPipe =",outputPipeName, hasOutputPipe(outputPipeName) )
 			if ( hasOutputPipe(outputPipeName) )
 			{
 				const pipe:IPipeFitting = pipesMap[outputPipeName] as IPipeFitting;
-				if(individual && !message.getPipeID()) message.setPipeID(pipe.id);
+				if(individual && !message.getPipeID()) message.setPipeID(pipe.channelID);
 				success = pipe.write(message);
 			} 
+//			trace(">\tJunction.sendMessage: success =",success);
 			return success;
 		}
 

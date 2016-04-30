@@ -62,7 +62,7 @@ package org.puremvc.as3.multicore.utilities.pipes.interfaces
 		function get pipeName():String;		
 		function set pipeName(value:String):void;	
 		
-		function set id(value:uint):void;
-		function get id():uint;
+		function set channelID(value:uint):void;
+		function get channelID():uint;
 	}
 }

@@ -48,7 +48,7 @@ package app.main.view
 					for (var i:int = 0; i < 1000; i++) 
 					{
 						thread.add(function():void{
-//							facade.sendNotification( MainFacade.CREATE_MODULE_CIRCLE_MAKER );
+							facade.sendNotification( MainFacade.CREATE_MODULE_CIRCLE_MAKER );
 							facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );
 						});
 					}

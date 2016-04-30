@@ -50,21 +50,22 @@ package app.modules.worker
 //			trace("> WorkerJunction : PipeAwareModule.WRKIN =", junction.hasPipe(PipeAwareModule.WRKIN))
 			if(!junction.hasPipe(PipeAwareModule.WRKIN)) {
 				// The WRKIN pipe to the worker from all modules
-				const teeMerge:TeeMerge = new TeeMerge();
-				const pipeListener:PipeListener = new PipeListener(this, handlePipeMessage);
+				const teeMerge		: TeeMerge = new TeeMerge();
+				const pipeListener	: PipeListener = new PipeListener(this, handlePipeMessage);
 				// This situation happend when no worker being accepted
 				// Master already has PipeAwareModule.WRKIN it's only 
 				if(workerNotSupported) 
 				{
 					const diconectFilter:Filter = new Filter(
-						WorkerJunction.FILTER_FOR_DISCONNECT_MODULE, null, 
+						WorkerJunction.FILTER_FOR_DISCONNECT_MODULE, pipeListener, 
 						workerJunction.filter_DisconnectModule
 					);
-					diconectFilter.connect(new PipeListener(this, handlePipeMessage));
+					
 					const responceFilter:Filter = new Filter( 
 						WorkerJunction.FILTER_FOR_STORE_RESPONCE, diconectFilter, 
 						workerJunction.filter_KeepMessageResponce as Function
 					);
+					
 					teeMerge.connect(responceFilter);
 				} 
 				else 
@@ -72,7 +73,7 @@ package app.modules.worker
 					// This only happend on Worker because he do not need to know about filtering, this is done already in Master
 					teeMerge.connect(pipeListener);
 				}
-				junction.registerPipe( PipeAwareModule.WRKIN,  Junction.INPUT, teeMerge );
+				junction.registerPipe( PipeAwareModule.WRKIN, Junction.INPUT, teeMerge );
 			}
 		}
 		
@@ -87,24 +88,24 @@ package app.modules.worker
 	
 		override public function handleNotification( note:INotification ):void
 		{
-//			trace("\n> WorkerJunctionMediator.handleNotification : ", note.getName(), note.getType());
+			trace("\n> WorkerJunctionMediator.handleNotification :", note.getName(), note.getType());
 			const type:String = note.getType();
+			var sendResponce:Boolean = false;
 			switch( note.getName() )
 			{
 				case WorkerFacade.SEND_RESULT_MAIN_COLOR:
 //					trace("> \t\t : SEND_RESULT_MAIN_COLOR");
-				break;	
 				case WorkerFacade.SEND_RESULT_LOG_SIZE:
 //					trace("> \t\t : SEND_RESULT_LOG_SIZE");
-				break;	
 				case WorkerFacade.SEND_RESULT_CIRCLE_BUTTON:
 //					trace("> \t\t : SEND_RESULT_CIRCLE_BUTTON");
+					sendResponce = true;
 				break;
 				// And let super handle the rest (ACCEPT_OUTPUT_PIPE)								
 				default:
 					super.handleNotification(note);
 			}
-			junction.sendMessage(PipeAwareModule.WRKOUT, new WorkerResponceMessage(note.getType(), note.getBody()));
+			if(sendResponce) junction.sendMessage(PipeAwareModule.WRKOUT, new WorkerResponceMessage(note.getType(), note.getBody()));
 		}
 		
 		/**

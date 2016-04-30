@@ -44,7 +44,7 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 		public var body:Object;
 		
 		// This is from where this messege is comming from
-		public var pipeID:uint;
+		public var pipeID:uint = 0;
 
 		public var uid:String;
 

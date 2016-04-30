@@ -41,15 +41,15 @@ package app.main.view
 		override public function onRegister():void
 		{
 			// The STDIN pipe to the shell from all modules 
-			junction.registerPipe( PipeAwareModule.STDIN,  Junction.INPUT, new TeeMerge() );
-			junction.registerPipe( PipeAwareModule.FROMWRK, Junction.INPUT, new TeeMerge() );
-			
-			junction.addPipeListener( PipeAwareModule.FROMWRK, this, handleWorkerPipeMessage );
-			junction.addPipeListener( PipeAwareModule.STDIN, this, handlePipeMessage );
+			junction.registerPipe( 		PipeAwareModule.STDIN,  Junction.INPUT, new TeeMerge() );
+			junction.addPipeListener( 	PipeAwareModule.STDIN, this, handlePipeMessage );
+
+			junction.registerPipe( 		PipeAwareModule.FROMWRK, Junction.INPUT, new TeeMerge() );
+			junction.addPipeListener( 	PipeAwareModule.FROMWRK, this, handleWorkerPipeMessage );
 			
 			// The STDLOG pipe from the shell to the logger
-			junction.registerPipe( PipeAwareModule.STDLOG, 	Junction.OUTPUT, new Pipe() );
-			junction.registerPipe( PipeAwareModule.TOWRK, 	Junction.OUTPUT, new Pipe() );
+			junction.registerPipe( PipeAwareModule.STDLOG, 	Junction.OUTPUT, new Pipe(Pipe.newChannelID()) );
+			junction.registerPipe( PipeAwareModule.TOWRK, 	Junction.OUTPUT, new Pipe(Pipe.newChannelID()) );
 			// The STDOUT pipe from the shell to all modules 
 			junction.registerPipe( PipeAwareModule.STDOUT,  Junction.OUTPUT, new TeeSplit() );
 			
@@ -59,16 +59,18 @@ package app.main.view
 		
 		private function handleWorkerPipeMessage(message:IPipeMessage):void
 		{
-//			trace("> MainJunctionMediator.handleWorkerPipeMessage:\n" + JSON.stringify(message) + "\n");
+			trace("> MainJunctionMediator.handleWorkerPipeMessage:\n" + JSON.stringify(message) + "\n");
 			if ( message is WorkerResponceMessage ) 
 			{
 				switch ( WorkerResponceMessage(message).responce ) 
 				{
 					case WorkerModule.MESSAGE_TO_MAIN_SET_COLOR:
+					{	
 						const color:uint = uint(WorkerResponceMessage(message).data);
 						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
 						junction.sendMessage(PipeAwareModule.STDLOG, new LogMessage(LogMessage.INFO, this.multitonKey, 'New color for main is recived: ' + color));
 						break;
+					}
 				}
 			}
 		}
@@ -92,44 +94,46 @@ package app.main.view
 		 */
 		override public function handleNotification( note:INotification ):void
 		{
-//			trace("\n> MainJunctionMediator.handleNotification:", note.getName());
+			trace("\n> MainJunctionMediator.handleNotification:", note.getName());
 			switch( note.getName() )
 			{
-				case MainFacade.GET_MODULE_LOGGER:
-//					trace("\t\t : MainFacade.GET_MODULE_LOGGER")
+				case MainFacade.GET_MODULE_LOGGER: 
+				{
+					trace("\t\t : MainFacade.GET_MODULE_LOGGER")
 					junction.sendMessage( PipeAwareModule.STDLOG, new UIQueryMessage(UIQueryMessage.GET, LoggerModule.GET_LOG_UI));
 					break;
-				case MainFacade.WORKER_GET_MAIN_COLOR:
-//					trace("\t\t : MainFacade.WORKER_GET_MAIN_COLOR")
+				}
+				case MainFacade.WORKER_GET_MAIN_COLOR: 
+				{
+					trace("\t\t : MainFacade.WORKER_GET_MAIN_COLOR")
 //					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, WorkerModule.MESSAGE_TO_MAIN_SET_COLOR	));
 					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, function(data:WorkerResponceMessage):void{
-//						trace(">>>>> RECEIVED COLOR: " + data);
 						const color:uint = uint(data.data);
 						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
 						junction.sendMessage( PipeAwareModule.STDLOG, new LogMessage( 0, multitonKey , "Color received by main: " + color) );
 					}));
 					break;
-				case  MainFacade.CONNECT_MODULE_TO_MAIN:
-					// Connect a module's STDSHELL to the shell's STDIN
+				}
+				case  MainFacade.CONNECT_MODULE_TO_MAIN: 
+				{
 					const module:IPipeAware = note.getBody() as IPipeAware;
 					
-					const shellIn:TeeMerge = junction.retrievePipe(PipeAwareModule.STDIN) as TeeMerge;
-					const moduleToShell:Pipe = new Pipe();
+					const moduleToMain	: Pipe = new Pipe(Pipe.newChannelID());
+					const mainToModule	: Pipe = new Pipe(moduleToMain.channelID);
 					
-					module.acceptOutputPipe(PipeAwareModule.STDMAIN, moduleToShell);
-					shellIn.connectInput(moduleToShell);
+					const mainInTee		: TeeMerge 		= junction.retrievePipe(PipeAwareModule.STDIN) as TeeMerge;
+					const mainOutTee	: IPipeFitting 	= junction.retrievePipe(PipeAwareModule.STDOUT) as IPipeFitting;
 					
-					// Connect the shell's STDOUT to the module's STDIN
-					const shellToModule:Pipe = new Pipe();
-					const shellOut:IPipeFitting = junction.retrievePipe(PipeAwareModule.STDOUT) as IPipeFitting;
+					module.acceptOutputPipe(PipeAwareModule.STDMAIN, moduleToMain);
+					mainInTee.connectInput(moduleToMain);
 					
-					module.acceptInputPipe(PipeAwareModule.STDIN, shellToModule);
-					shellOut.connect(shellToModule);
+					module.acceptInputPipe(PipeAwareModule.STDIN, mainToModule);
+					mainOutTee.connect(mainToModule);
 					
 					sendNotification(LogMessage.SEND_TO_LOG,"Connected new module instance to Shell.", LogMessage.LEVELS[LogMessage.DEBUG]);
 					
 					break;
-
+				}
 				// Let super handle the rest (ACCEPT_OUTPUT_PIPE, ACCEPT_INPUT_PIPE, SEND_TO_LOG)								
 				default:
 					super.handleNotification(note);
@@ -139,7 +143,7 @@ package app.main.view
 		
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-//			trace("MainJunction.handlePipeMessage:", message);
+			trace("MainJunction.handlePipeMessage:", message);
 			if ( message is UIQueryMessage )
 			{
 				switch ( UIQueryMessage(message).name )

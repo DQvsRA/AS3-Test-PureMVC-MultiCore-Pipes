@@ -1,8 +1,3 @@
-/*
- PureMVC AS3/MultiCore Utility – Pipes
- Copyright (c) 2008 Cliff Hall<cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
@@ -19,7 +14,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		/**
 		 * Constructor.
 		 * <P>
-		 * Create the TeeMerge and the two optional constructor inputs.
+		 * Create the TeeMerge.
 		 * This is the most common configuration, though you can connect
 		 * as many inputs as necessary by calling <code>connectInput</code>
 		 * repeatedly.</P>
@@ -27,10 +22,15 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 * Connect the single output fitting normally by calling the 
 		 * <code>connect</code> method, as you would with any other IPipeFitting.</P>
 		 */
-		public function TeeMerge( input1:IPipeFitting=null, input2:IPipeFitting=null ) 
+		public function TeeMerge() 
 		{
-			if (input1) connectInput(input1);
-			if (input2) connectInput(input2);
+			super(Pipe.newChannelID());
+		}
+		
+		public function merge(input1:IPipeFitting, input2:IPipeFitting):void 
+		{
+			connectInput(input1);
+			connectInput(input2);
 		}
 
 		/** 

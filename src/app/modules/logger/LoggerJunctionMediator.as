@@ -47,14 +47,17 @@ package app.modules.logger
 			
 			junction.registerPipe( PipeAwareModule.FROMWRK, Junction.INPUT, new TeeMerge() );
 			junction.addPipeListener(PipeAwareModule.FROMWRK, this, handleWorkerPipeMessage);
-//
+
 			junction.registerPipe( PipeAwareModule.TOWRK, Junction.OUTPUT, new TeeSplit() );
 			junction.registerPipe( PipeAwareModule.STDMAIN, Junction.OUTPUT, new TeeSplit() );
 		}
 		
 		private function handleWorkerPipeMessage(message:IPipeMessage):void
 		{
+			// Because Logger also connected to worker with standart WRKOUT -> FROMWRK
+			// So it may recieve messages from worker when worker junction sendMessage when individual mark to false
 			trace("\n> LoggerJunctionMediator.handleWorkerPipeMessage:" + JSON.stringify(message) + "\n");
+			sendNotification( LoggerFacade.LOG_MSG, new LogMessage(LogMessage.DEBUG, this.multitonKey,  JSON.stringify(message)) );
 		}
 		
 		override public function listNotificationInterests():Array
@@ -67,18 +70,17 @@ package app.modules.logger
 	
 		override public function handleNotification( note:INotification ):void
 		{
-//			trace("\n> LoggerJunctionMediator.handleNotification", note.getName());
-			const type:String = note.getType();
+			trace("> LoggerJunctionMediator.handleNotification :", note.getName(), note.getType());
 			switch( note.getName() )
 			{
 				// Send the LogWindow UI Component 
 				case LoggerFacade.EXPORT_LOG_UI:
-//					trace("\t\t : LoggerFacade.EXPORT_LOG_UI");
+					trace("\t\t : LoggerFacade.EXPORT_LOG_UI");
 					const loggerTF:TextField = note.getBody() as TextField;
 					const logWindowMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, LoggerModule.MESSAGE_TO_MAIN_LOG_UI, loggerTF);
 					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_LOG_SIZE, null, function(result:WorkerResponceMessage):void {
 						const fontSize:uint = uint(result.data);
-//						trace("Message from worker received by logger", fontSize);
+						trace("\t\t : Message from worker received by logger, result =", fontSize);
 						const format:TextFormat = loggerTF.getTextFormat();
 						format.size = fontSize;
 						loggerTF.defaultTextFormat = format;
@@ -87,7 +89,6 @@ package app.modules.logger
 					break;
 				default:
 					super.handleNotification(note);
-					
 			}
 		}
 		
@@ -96,7 +97,7 @@ package app.modules.logger
 		 */
 		override public function handlePipeMessage( message:IPipeMessage ):void
 		{
-//			trace("> LoggerJunctionMediator: handlePipeMessage =", JSON.stringify(message));
+			trace("\n> LoggerJunctionMediator.handlePipeMessage =", JSON.stringify(message));
 			if ( message is LogMessage ) 
 			{
 				sendNotification( LoggerFacade.LOG_MSG, message );

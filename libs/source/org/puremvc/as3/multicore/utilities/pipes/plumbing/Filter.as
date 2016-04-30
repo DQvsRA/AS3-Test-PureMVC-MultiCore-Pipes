@@ -28,7 +28,8 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		public function Filter( name:String, output:IPipeFitting=null, filter:Function=null, params:Object=null ) 
 		{
-			super( output );
+			super( output ? output.channelID : Pipe.newChannelID() );
+			if(output) this.connect(output);
 			this.name = name;
 			if ( filter != null ) setFilter( filter );
 			if ( params != null ) setParams( params );

@@ -51,7 +51,7 @@ package app.common.worker
 					diconectFilter.connect(new PipeListener(workerModule, 
 						function ( message:WorkerRequestMessage ):void 
 						{
-//							trace("\n> WorkerJunction : PipeMessage_MasterToWorker: \n\t\t : isBusy = " + this.isBusy + "\n", JSON.stringify(message) + "\n");
+							trace("\n> WorkerJunction : PipeMessage_MasterToWorker: \n\t\t : isBusy = " + this.isBusy + "\n", JSON.stringify(message) + "\n");
 							this.send( new WorkerTask(WorkerTask.MESSAGE, message ));
 						})
 					);
@@ -68,7 +68,7 @@ package app.common.worker
 					this.registerPipe( PipeAwareModule.WRKOUT, Junction.OUTPUT, teeSplit );
 					this.addPipeListener( PipeAwareModule.WRKOUT, workerModule, function( message:WorkerResponceMessage ):void 
 					{
-//						trace("\n> WorkerJunction : PipeMessage_WorkerToMaster: \n\t\t : isBusy = " + this.isBusy + "\n", JSON.stringify(message) + "\n");
+						trace("\n> WorkerJunction : PipeMessage_WorkerToMaster: \n\t\t : isBusy = " + this.isBusy + "\n", JSON.stringify(message) + "\n");
 						this.send( new WorkerTask(WorkerTask.MESSAGE, message) );
 					});
 					
@@ -86,7 +86,7 @@ package app.common.worker
 					return function (e:Event):void {
 						const taskType 	: * = (e.currentTarget as MessageChannel).receive(true);
 						const responce 	: IPipeMessage = __getData() as IPipeMessage;
-//						trace("\n> CHANNEL_MESSAGE : ", __isMaster, taskType, "\n" + JSON.stringify(responce) + "\n");
+						trace("\n> CHANNEL_MESSAGE : ", __isMaster, taskType, "\n" + JSON.stringify(responce) + "\n");
 						if (taskType is int) {
 							switch(taskType)
 							{
@@ -99,7 +99,7 @@ package app.common.worker
 								}
 								break;
 							}
-//							trace("\n===> COMPLETE TASK:", __isMaster, taskType);
+							trace("\n===> COMPLETE TASK:", __isMaster, taskType);
 							__complete();
 						}
 					}
@@ -111,28 +111,27 @@ package app.common.worker
 		{
 			const request:String = message.request;
 			var disconnected:IPipeFitting;
+			trace("\n> filter_DisconnectModule", request);
 			switch(request)
 			{
 				case WorkerModule.DICONNECT_INPUT_PIPE:
 				{
-//					trace("> filterDisconnectOutput, DISCONNECT_INPUT_PIPE");
+					trace("> filterDisconnectOutput, DISCONNECT_INPUT_PIPE");
 					disconnected = message.data as IPipeFitting;
-//					trace("\t\t: pipeNane:", disconnected.pipeName);
-//					trace("\t\t: id:", disconnected.id);
+					trace("\t\t: pipeNane:", disconnected.pipeName);
+					trace("\t\t: channedID:", disconnected.channelID);
 					if(disconnected) disconnected.disconnect();
 					filter_ApplyMessageResponce(new WorkerResponceMessage(message.responce));
 					return null;
 				}
 				case WorkerModule.DICONNECT_OUTPUT_PIPE:
 				{
-//					trace("> filterDisconnectOutput, DISCONNECT_OUTPUT_PIPE");
+					trace("> filterDisconnectOutput, DISCONNECT_OUTPUT_PIPE");
 					const teeSplit:TeeSplit = this.retrievePipe(PipeAwareModule.WRKOUT) as TeeSplit;
 					if(teeSplit) {
 						disconnected = message.data as IPipeFitting;
-//						trace(disconnected.pipeName);
 						if(disconnected) disconnected.disconnect();
 						disconnected = teeSplit.disconnectFitting(disconnected);
-//						trace(disconnected);
 						if(disconnected) disconnected.disconnect();
 						filter_ApplyMessageResponce(new WorkerResponceMessage(message.responce));
 					}
@@ -143,13 +142,13 @@ package app.common.worker
 		}
 		
 		public function filter_ApplyMessageResponce(message:WorkerResponceMessage, params:Object = null):IPipeMessage {
-//			trace("> filterApplyFunctionResponce", JSON.stringify(message));
+			trace("\n> filter_ApplyMessageResponce", JSON.stringify(message));
 			const responceMsgID:String = message.responce;
 			const msgResponce:MessageResponce = _responces[responceMsgID];
 			
 			if(msgResponce) {
 				const responce:* = msgResponce.responce;
-//				trace("\t\t : taskResponce =", responce);
+				trace("\t\t : taskResponce =", responce);
 				
 				if(responce is Function) 
 				{
@@ -168,9 +167,9 @@ package app.common.worker
 		}
 		
 		public function filter_KeepMessageResponce(message:WorkerRequestMessage, params:Object = null):IPipeMessage {
-//			trace("> filterKeepResponceFunction", message);
-			const responceMsgID:String = message.getUID(); //UIDUtil.createUID();
-			
+			trace("\n> filter_KeepMessageResponce", message);
+			const responceMsgID:String = message.getUID();
+
 			_responces[responceMsgID] = new MessageResponce(message.responce, message.getPipeID());
 			message.responce = responceMsgID;
 			

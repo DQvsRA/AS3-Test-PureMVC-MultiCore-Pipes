@@ -11,7 +11,7 @@ package app.modules.worker.controller.commands
 		override public function execute(note:INotification):void {
 			var logFontSize:uint = 12;
 			const responce:String = note.getType();
-			trace("CalculateLogSizeCommand", responce);
+//			trace("CalculateLogSizeCommand", responce);
 			sendNotification(WorkerFacade.SEND_RESULT_LOG_SIZE, logFontSize, responce);
 		}
 	}

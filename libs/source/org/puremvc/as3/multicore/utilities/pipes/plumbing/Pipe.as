@@ -1,8 +1,3 @@
-/*
- PureMVC AS3/MultiCore Utility – Pipes
- Copyright (c) 2008 Cliff Hall<cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package org.puremvc.as3.multicore.utilities.pipes.plumbing
 {
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
@@ -18,20 +13,20 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	public class Pipe implements IPipeFitting
 	{
 		private static var serial:Number = 1;
-		public static function getID():uint { return serial++; }
+		public static function newChannelID():uint { return serial++; }
 		
 		public var chainLength:uint = 0;
 		
 		private var
-			_id			: uint = Pipe.getID()
+			_channelID			: uint = 0
 		,	_pipeName	: String
 		;
 
 		protected var output:IPipeFitting;
 		
-		public function Pipe( output:IPipeFitting = null )
+		public function Pipe( channelID:uint )
 		{
-			if (output) connect(output);
+			_channelID = channelID;
 		}
 
 		/**
@@ -47,6 +42,9 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var success:Boolean = false;
 			if (this.output == null) {
 				output.pipeName = this.pipeName;
+				if(output is Filter) {
+					output.channelID = this._channelID;
+				}
 				this.output = output;
 				success = true;
 				chainLength++;
@@ -81,6 +79,7 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		public function write( message:IPipeMessage ) : Boolean
 		{
+//			trace("======> Pipe("+pipeName+").write:",output, message);
 			return output && output.write( message );
 		}
 
@@ -88,8 +87,8 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 
 		public function set pipeName(value:String):void { _pipeName = value; }
 
-		public function get id():uint { return _id; }
+		public function get channelID():uint { return _channelID; }
 
-		public function set id(value:uint):void { _id = value; }
+		public function set channelID(value:uint):void { _channelID = value; }
 	}
 }

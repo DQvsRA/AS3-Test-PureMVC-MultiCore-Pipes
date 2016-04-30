@@ -13,22 +13,21 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 	{
 		private var 
 			_outputs	: Array = new Array()
-		,	_id			: uint = Pipe.getID()
+		,	_channelID	: uint = Pipe.newChannelID()
 		,	_pipeName	: String
 		;
 		/**
 		 * Constructor.
 		 * <P>
-		 * Create the TeeSplit and connect the up two optional outputs.
+		 * Create the TeeSplit.
 		 * This is the most common configuration, though you can connect
 		 * as many outputs as necessary by calling <code>connect</code>.</P>
 		 */
-		public function TeeSplit( output1:IPipeFitting=null, output2:IPipeFitting=null ) 
+		public function TeeSplit() 
 		{
-			if (output1) connect(output1);
-			if (output2) connect(output2);
+			
 		}
-
+		
 		/** 
 		 * Connect the output IPipeFitting.
 		 * <P>
@@ -75,18 +74,18 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 			var removed	: IPipeFitting;
 			var output	: IPipeFitting;
 			var length	: uint = _outputs.length;
-//			trace("> TeeSplit.disconnectFitting, target.id =", target.id);
-//			trace("> TeeSplit.disconnectFitting, target.pipe =", target.pipeName);
-//			trace("> TeeSplit.disconnectFitting, length =", length);
+			trace(">\t\t : TeeSplit.disconnectFitting, target.id =", target.channelID);
+			trace(">\t\t : TeeSplit.disconnectFitting, target.pipe =", target.pipeName);
+			trace(">\t\t : TeeSplit.disconnectFitting, length =", length);
 			while(length--) {
 				output = _outputs[length];
-//				trace(">\t\t output :", output.id, output.pipeName);
-				if (output.id === target.id) {
+				trace(">\t\t\t output :", output.channelID, output.pipeName);
+				if (output.channelID === target.channelID) {
 					removed = _outputs.removeAt(length - 1);
 					break;
 				}
 			}
-//			trace("> TeeSplit.disconnectFitting, removed =", removed);
+			trace(">\t\t : TeeSplit.disconnectFitting, removed =", removed);
 			return removed;
 		}
 		
@@ -105,17 +104,28 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		 */
 		public function write( message:IPipeMessage ):Boolean
 		{
-			var success:Boolean = true;
-			var l:uint = _outputs.length;
-			var output:IPipeFitting;
-			while (l--) {
-				output = _outputs[l];
+			var success	: Boolean = true;
+			var output	: IPipeFitting;
+			var counter	: uint = _outputs.length;
+			const pid	: uint = message.getPipeID();
+			const isIndividual:Boolean = pid > 0;
+			
+			trace("\t\t : TeeSplit.write: isIndividual =", isIndividual, pid);
+			
+			while (counter--) {
+				output = _outputs[counter];
 				if( !output ) {
-					delete _outputs[l];
+					delete _outputs[counter];
 					output = null;
-					l++;
+					counter++;
 				}
-				if (output && !output.write( message ) ) success = false;
+				trace("\t\t\t : output =", output.pipeName);
+				if(isIndividual) {
+					success = output && (_channelID == pid || output.channelID == pid) && !output.write( message );
+					break;
+				} else {
+					success = output && !output.write( message );
+				}
 			}
 			return success;	
 		}
@@ -123,8 +133,8 @@ package org.puremvc.as3.multicore.utilities.pipes.plumbing
 		public function get pipeName():String { return _pipeName; }
 		public function set pipeName(value:String):void { _pipeName = value; }
 
-		public function get id():uint { return _id; }
-		public function set id(value:uint):void { _id = value; }
+		public function get channelID():uint { return _channelID; }
+		public function set channelID(value:uint):void { _channelID = value; }
 
 	}
 }

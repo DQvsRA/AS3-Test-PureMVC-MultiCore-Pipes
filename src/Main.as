@@ -26,6 +26,8 @@ package
 			_back = this.graphics;
 			this.changeColor(0xf1f1f1)
 			
+			stage.frameRate = 60;	
+				
 			MainFacade.getInstance(MainFacade.NAME).startup(this);
 		}
 		
