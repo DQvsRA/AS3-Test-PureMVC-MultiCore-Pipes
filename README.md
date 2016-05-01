@@ -39,13 +39,21 @@ Junction is registering this pipes with special names (or "channel") and appropr
 Then the rest of the application is initialized and we are registering others modules, for example LoggerModuleMediator and MainJunctionMediator.
 
 **_MainJunctionMediator_** is registering two input pipes - STDIN for standart input from any modules and separated "channel" for listening messages from worker module FROMWRK. Also it can send output messages to STDLOG, TOWRK and standart STDOUT for any modules who has same input "channel". When it has all the neccessary pipes and tees then it connects themself to WorkerModule and LoggerModule with:
->*sendNotification( MainFacade.CONNECT_MAIN_TO_LOGGER, junction );
+>*sendNotification( MainFacade.CONNECT_MAIN_TO_LOGGER, junction );<br>
 sendNotification( MainFacade.CONNECT_MAIN_TO_WORKER, junction );*
 
 Which is handled by WorkerModuleMediator (CalculatorModuleMediator) and LoggerModuleMediator appropriate.
-After it all be done and Main is ready for action it send two notifications that will be rewriten to Messages inside MainJunctionMediator who is sending these messages to the modules for processing:
->*facade.sendNotification( MainFacade.GET_MODULE_LOGGER );
+
+After Main is ready for action it send two notifications that will be rewriten to Messages inside MainJunctionMediator who is sending these messages to the modules for processing:
+>*facade.sendNotification( MainFacade.GET_MODULE_LOGGER );<br>
 facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );*
+
+MainJunctionMediator is also waiting for responce (results of messages processing) by listening for incoming messages. Then it will apply the result internally.
+
+You can manually run process of sending message (MainFacade.WORKER_GET_MAIN_COLOR) to worker by pressing 0 key on keyboard.
+
+Also Main can run special command (try to press SPACEBAR): CreateCircleModuleCommand.
+This command will create CircleMakerModule and connect it to LoggerModule, to Main and to WorkerModule.
 
 LoggerJunctionMediator is registering two input pipes - one TeeMerge for regular messages from any modules (STDIN "channel") and another TeeMerge for messages from worker (FROMWRK "channel")
 
