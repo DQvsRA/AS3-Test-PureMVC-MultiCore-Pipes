@@ -15,5 +15,10 @@ It contains one main (shell) application and three modules (PureMVC cores):
 - Calculator Module : this is a worker module (if worker is supported), it process data for other modules and communicate with them with special pipe type (TOWRK and FROMWRK)
 
 ###Main (shell) module application
-The main core holds every module by registering special module mediators. Each module mediator must contains a reference to PipeAwareModule instance - the object that keeps module facade inside, and this facade is registered in static multitone storage-variable (by key).
+The main core holds every module by registering special module mediators. Each module mediator must contains a reference to PipeAwareModule instance - the object that keeps module facade inside, and this facade is registered in static multitone storage-variable (by key). 
+
+Every module must have special Junction that holds and register incomming pipes and tees, and also JunctionMediator which receives and processes notifications about pipe connections incoming from PipeAwareModule (who are sent from another modules mediators registered at main module). 
+**JunctionMediator is a entry point for incoming messages from others modules, this is a place where messages must be retranslated into internal notifications to be processed by that module.**
+**JunctionMediator is the place from where messages to others modules may be send by using junction.sendMessages(...). So to send back result you need to catch internal notification from module's entities and rework it to special Message (class).**
+
 It starting with MainStartupCommand. First worker is being initialized and we are waiting for WorkerEvent.READY event, it fires any way if worker is supported or not. Then the rest of application is initialized.
