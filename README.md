@@ -34,14 +34,17 @@ Instead of using Tees you can use simple Pipes for one way communications for ea
 
 Junction is registering this pipes with special names (or "channel") and appropriate type for Junction.INPUT or Junction.OUTPUT. And then this "channels" is used to catch messages by appling (or connecting) a listener to them (PipeListener which is like a pipe also implementing IPipeFitting). So Junction is adding listener for "channel" and listening for incoming messages on it (actually this listener is a final "pipe" where message is will be finally written).
 
-Application starting with MainStartupCommand. First we register worker module mediator (CalculatorModuleMediator) where worker is being initialized and we are waiting for WorkerEvent.READY event from WorkerModule, it fires any way if worker is supported or not. 
+**_Application starting with MainStartupCommand_**. First we register worker module mediator (CalculatorModuleMediator) where worker is being initialized and we are waiting for WorkerEvent.READY event from WorkerModule, it fires any way if worker is supported or not. 
 
 Then the rest of the application is initialized and we are registering others modules, for example LoggerModuleMediator and MainJunctionMediator.
 
-*MainJunctionMediator* is registering two input pipes - STDIN for standart input from any modules and separated "channel" for listening messages from worker module FROMWRK. Also it can send output messages to STDLOG, TOWRK and standart STDOUT for any modules who has same input "channel". When it has all the neccessary pipes and tees then it connects themself to WorkerModule and LoggerModule with: 
+**_MainJunctionMediator_** is registering two input pipes - STDIN for standart input from any modules and separated "channel" for listening messages from worker module FROMWRK. Also it can send output messages to STDLOG, TOWRK and standart STDOUT for any modules who has same input "channel". When it has all the neccessary pipes and tees then it connects themself to WorkerModule and LoggerModule with: 
 *sendNotification(MainFacade.CONNECT_MAIN_TO_LOGGER, junction );*
 *sendNotification(MainFacade.CONNECT_MAIN_TO_WORKER, junction );*
-Which is handled by WorkerModuleMediator (CalculatorModuleMediator) and LoggerModuleMediator appropriate
+Which is handled by WorkerModuleMediator (CalculatorModuleMediator) and LoggerModuleMediator appropriate.
+After it all be done and Main is ready for action it send two notifications that will be rewriten to Messages inside MainJunctionMediator who is sending these messages to the modules for processing:
+*facade.sendNotification( MainFacade.GET_MODULE_LOGGER );*
+*facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );*
 
 LoggerJunctionMediator is registering two input pipes - one TeeMerge for regular messages from any modules (STDIN "channel") and another TeeMerge for messages from worker (FROMWRK "channel")
 
