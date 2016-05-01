@@ -30,7 +30,7 @@ For *single connections* Junction must have a simple pipe and for *multiple conn
 
 Instead of using Tees you can use simple Pipes for one way communications for each sides. **We recommend you to use TeeMerge and TeeSplit.** And the use of pipes is very depends on methods of their connection. 
 
-Each pipe must have a channelID.
+**Each pipe must have a channelID.** This is necessary for sending individual messages if output tee has a lot of connections.
 
 Junction is registering this pipes with special names (or "channel") and appropriate type for Junction.INPUT or Junction.OUTPUT. And then this "channels" is used to catch messages by appling (or connecting) a listener to them (PipeListener which is like a pipe also implementing IPipeFitting). So Junction is adding listener for "channel" and listening for incoming messages on it (actually this listener is a final "pipe" where message is will be finally written).
 
