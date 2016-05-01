@@ -24,4 +24,9 @@ Every module must have special Junction that holds and register incomming pipes 
 
 *This messages will also be received only by JunctionMediator of others modules whoes junction have appropriate pipes and tees.*
 
-It starting with MainStartupCommand. First worker is being initialized and we are waiting for WorkerEvent.READY event, it fires any way if worker is supported or not. Then the rest of application is initialized.
+For *single connections* Junction must have a simple pipe and for *multiple connection* Junction must have special tees - TeeMerge for input or TeeSplit for output.
+
+Application starting with MainStartupCommand. First we register worker module mediator (CalculatorModuleMediator) where worker is being initialized and we are waiting for WorkerEvent.READY event from WorkerModule, it fires any way if worker is supported or not. 
+
+Then the rest of the application is initialized and we are registering others modules, for example LoggerModuleMediator and MainJunctionMediator.
+
