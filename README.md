@@ -52,8 +52,14 @@ MainJunctionMediator is also waiting for responce (results of messages processin
 
 You can manually run process of sending message (MainFacade.WORKER_GET_MAIN_COLOR) to worker by pressing 0 key on keyboard.
 
-Also Main can run special command (try to press SPACEBAR): CreateCircleModuleCommand.
-This command will create CircleMakerModule and connect it to LoggerModule, to Main and to WorkerModule.
+Also Main can run special command (try to press SPACEBAR): CreateCircleButtonModuleCommand.
+This command will create CircleButtonModule and connect it to LoggerModule, to Main and to WorkerModule at runtime. And then CircleButtonModuleMediator ask that module to get visual entity to Main, by sending special message (see onRegister inside Mediator).
+
+###CircleButtonModule
+This module is creating core PureMVC who is working around interactive shape - circle button. It has his own Proxy for keeping data and Mediator to process action from that object. It's all initialized inside StartupCircleButtonCommand.
+After it had been created his module (from CircleButtonModuleMediator to CircleButtonModule) is asking them to get this interactive shape which is then transfering to the Main where it is added to the stage. But before that action 
+
+
 
 LoggerJunctionMediator is registering two input pipes - one TeeMerge for regular messages from any modules (STDIN "channel") and another TeeMerge for messages from worker (FROMWRK "channel")
 
