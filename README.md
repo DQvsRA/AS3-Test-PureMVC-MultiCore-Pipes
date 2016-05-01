@@ -28,13 +28,17 @@ For *single connections* Junction must have a simple pipe and for *multiple conn
 - **TeeMerge** is extend regular Pipe and may connect multiple incoming pipes to themself by using .connectInput(IPipeFitting) method or connect themself to pipe with .connect method (from Pipe).
 - **TeeSplit** is implementing IPipeFitting interface and does collect all output pipes into array in which messages will be writing. 
 
-Instead of using Tees you can use simple Pipes for one way communications for each sides. **We recommend you to use TeeMerge and TeeSplit.**
+Instead of using Tees you can use simple Pipes for one way communications for each sides. **We recommend you to use TeeMerge and TeeSplit.** And the use of pipes is very depends on methods of their connection. 
+
+Each pipe must have a channelID.
 
 Junction is registering this pipes with special names (or "channel") and appropriate type for Junction.INPUT or Junction.OUTPUT. And then this "channels" is used to catch messages by appling (or connecting) a listener to them (PipeListener which is like a pipe also implementing IPipeFitting). So Junction is adding listener for "channel" and listening for incoming messages on it (actually this listener is a final "pipe" where message is will be finally written).
 
 Application starting with MainStartupCommand. First we register worker module mediator (CalculatorModuleMediator) where worker is being initialized and we are waiting for WorkerEvent.READY event from WorkerModule, it fires any way if worker is supported or not. 
 
 Then the rest of the application is initialized and we are registering others modules, for example LoggerModuleMediator and MainJunctionMediator.
+
+MainJunctionMediator is registering two input pipes - STDIN for standart input from any modules and separated "channel" for listening messages from worker module FROMWRK. Also it can send output messages to STDLOG, TOWRK and standart STDOUT for any modules who has same input "channel".
 
 LoggerJunctionMediator is registering two input pipes - one TeeMerge for regular messages from any modules (STDIN "channel") and another TeeMerge for messages from worker (FROMWRK "channel")
 
