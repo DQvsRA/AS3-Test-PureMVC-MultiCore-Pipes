@@ -57,7 +57,15 @@ This command will create CircleButtonModule and connect it to LoggerModule, to M
 
 ###CircleButtonModule
 This module is creating core PureMVC who is working around interactive shape - circle button. It has his own Proxy for keeping data and Mediator to process action from that object. It's all initialized inside StartupCircleButtonCommand.
-After it had been created his module (from CircleButtonModuleMediator to CircleButtonModule) is asking them to get this interactive shape which is then transfering to the Main where it is added to the stage. But before that action (send to Main) is launched CircleButtonJunctionMediator make request to the worker to get parameters for that button, it's done from CircleButtonMediator who is responsable for that button. And after WorkerModule finished calculation and send back message with results and it will be applyed to button only then this button will be send to Main throw pipe message. After message from WorkerModule has been processed this module (CircleButtonModule) will be disconnected from WorkerModule. But this module still can communicate with LoggerModule and send them messages, so when you click on CircleButton it send message to LogModule with click's statistics. 
+After it had been created his module (from CircleButtonModuleMediator to CircleButtonModule) is asking them to get this interactive shape which is then transfering to the Main where it is added to the stage. 
+But before that action (send to Main) is launched CircleButtonJunctionMediator make request to the worker to get parameters for that button, it's done from CircleButtonMediator who is responsable for that button. And after WorkerModule finished calculation and send back message with results and it will be applyed to button only then this button will be send to Main throw pipe message. After message from WorkerModule has been processed this module (CircleButtonModule) will be disconnected from WorkerModule. 
+But this module still can communicate with LoggerModule and send them messages, so when you click on CircleButton it send message to LogModule with click's statistics. 
 
-LoggerJunctionMediator is registering two input pipes - one TeeMerge for regular messages from any modules (STDIN "channel") and another TeeMerge for messages from worker (FROMWRK "channel")
+###LoggerModule
+LoggerJunctionMediator is registering two input pipes - one TeeMerge for regular messages from any modules (STDIN "channel") and another TeeMerge for messages from worker (FROMWRK "channel"). Before export log TextField to the Main LoggerJunctionMediator (who is received export message) will send message to WorkerModule and ask him about font size. 
+
+This module will not break connection with WorkerModule and it can received all the messages that comes from WorkerModule FROMWRK, but only if special paramter is passed when worker junction.sendMessage is called (individual = false).
+
+### This was short description about how this simple application works.
+
 
