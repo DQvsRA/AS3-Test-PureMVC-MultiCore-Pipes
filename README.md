@@ -22,9 +22,11 @@ Every module must have special Junction that holds and register incomming pipes 
 
 > **JunctionMediator is the place from where messages to others modules may be send by using junction.sendMessages(...). So to send back result you need to catch internal notification from module's entities and rework it to special Message (class).**
 
-*This messages will also be received only by JunctionMediator of others modules whoes junction have appropriate pipes and tees.*
+This messages will also be received only by JunctionMediator of others modules whoes junction have appropriate pipes and tees.
 
 For *single connections* Junction must have a simple pipe and for *multiple connection* Junction must have special tees - TeeMerge for input or TeeSplit for output.
+- **TeeMerge** is extend regular Pipe and may connect multiple incomming pipes by using .connectInput(IPipeFitting) method or connect themself to pipe with .connect method (from Pipe).
+- **TeeSplit** is implementing IPipeFitting interface and does collect all output pipes into array in which messages will be writing. 
 
 Application starting with MainStartupCommand. First we register worker module mediator (CalculatorModuleMediator) where worker is being initialized and we are waiting for WorkerEvent.READY event from WorkerModule, it fires any way if worker is supported or not. 
 
