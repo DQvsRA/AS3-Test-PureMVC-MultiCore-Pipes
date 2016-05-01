@@ -30,7 +30,7 @@ For *single connections* Junction must have a simple pipe and for *multiple conn
 
 Instead of using Tees you can use simple Pipes for one way communications for each sides.
 
-Junction is registering this pipes with special names (or "channel") and appropriate type for INPUT or OUTPUT. And then this "channels" is used to catch messages by appling (or connecting) a listener to them (PipeListener which is like a pipe also implementing IPipeFitting). So Junction is adding listener for "channel" and listening for incoming messages on it (actually this listener is a final "pipe" where message is will be finally written).
+Junction is registering this pipes with special names (or "channel") and appropriate type for Junction.INPUT or Junction.OUTPUT. And then this "channels" is used to catch messages by appling (or connecting) a listener to them (PipeListener which is like a pipe also implementing IPipeFitting). So Junction is adding listener for "channel" and listening for incoming messages on it (actually this listener is a final "pipe" where message is will be finally written).
 
 Application starting with MainStartupCommand. First we register worker module mediator (CalculatorModuleMediator) where worker is being initialized and we are waiting for WorkerEvent.READY event from WorkerModule, it fires any way if worker is supported or not. 
 
