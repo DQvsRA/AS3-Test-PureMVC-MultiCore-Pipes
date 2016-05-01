@@ -8,7 +8,7 @@ package app.main.view
 	import app.common.worker.WorkerResponceMessage;
 	import app.main.MainFacade;
 	import app.modules.CalculatorModule;
-	import app.modules.CircleMakerModule;
+	import app.modules.CircleButtonModule;
 	import app.modules.LoggerModule;
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
@@ -152,7 +152,7 @@ package app.main.view
 						sendNotification(MainFacade.APPEND_LOG_WINDOW, UIQueryMessage(message).component )
 						junction.sendMessage(PipeAwareModule.STDLOG, new LogMessage(LogMessage.INFO, this.multitonKey, 'Recieved the Log Window on STDSHELL'));
 						break;
-					case CircleMakerModule.MESSAGE_TO_MAIN_CIRCLE_MAKER_BUTTON:
+					case CircleButtonModule.MESSAGE_TO_MAIN_CIRCLE_MAKER_BUTTON:
 						sendNotification(MainFacade.APPEND_CIRCLE_BUTTON, UIQueryMessage(message).component, UIQueryMessage(message).name )
 						break;
 				}

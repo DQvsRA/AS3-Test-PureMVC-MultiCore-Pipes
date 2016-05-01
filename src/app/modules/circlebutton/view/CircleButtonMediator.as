@@ -1,12 +1,3 @@
-/*
- PureMVC AS3 MultiCore Demo – Flex PipeWorks - Prattler Module
- Copyright (c) 2008 Cliff Hall <cliff.hall@puremvc.org>
-
- Parts originally from: 
- PureMVC AS3 Demo – AIR RSS Headlines 
- Copyright (c) 2007-08 Simon Bailey <simon.bailey@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package app.modules.circlebutton.view
 {
 	import flash.events.MouseEvent;

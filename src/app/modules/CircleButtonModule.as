@@ -3,13 +3,13 @@ package app.modules
 	import app.common.PipeAwareModule;
 	import app.modules.circlebutton.CircleButtonFacade;
 
-	public class CircleMakerModule extends PipeAwareModule
+	public class CircleButtonModule extends PipeAwareModule
 	{
 		static public const MESSAGE_TO_MAIN_CIRCLE_MAKER_BUTTON	: String = "appendCircleButton";
 		
 		static public const RECIEVE_CIRCLE_BUTTON_PARAMERTS		: String = "recieveCircleButtonParamets";
 		
-		public function CircleMakerModule()
+		public function CircleButtonModule()
 		{
 			super(CircleButtonFacade.getInstance( moduleID ));
 			CircleButtonFacade(facade).startup( this );
@@ -32,7 +32,7 @@ package app.modules
 		}
 		
 		private static var serial:Number = 0;
-		private var moduleID:String = CircleMakerModule.getNextID();
+		private var moduleID:String = CircleButtonModule.getNextID();
 		
 	}
 }

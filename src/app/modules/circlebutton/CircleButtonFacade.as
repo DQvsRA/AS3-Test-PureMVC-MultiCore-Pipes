@@ -7,7 +7,7 @@ package app.modules.circlebutton
 {
 	import app.modules.circlebutton.controller.commands.CircleButtonClickedCommand;
 	import app.modules.circlebutton.controller.StartupCircleButtonCommand;
-	import app.modules.CircleMakerModule;
+	import app.modules.CircleButtonModule;
 	import org.puremvc.as3.multicore.patterns.facade.Facade;
 
 	/**
@@ -56,7 +56,7 @@ package app.modules.circlebutton
          * 
          * @param app a reference to the application component 
          */  
-        public function startup( app:CircleMakerModule ):void
+        public function startup( app:CircleButtonModule ):void
         {
             sendNotification( STARTUP, app );
         }

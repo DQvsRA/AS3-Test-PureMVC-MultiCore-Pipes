@@ -25,7 +25,6 @@ package app.common.worker
 		override public function onRegister():void
 		{
 			const workerNotSupported:Boolean = workerJunction && !workerJunction.isSupported;
-//			trace("> WorkerJunction : PipeAwareModule.WRKOUT =", junction.hasPipe(PipeAwareModule.WRKOUT))
 			if (!junction.hasPipe(PipeAwareModule.WRKOUT)) {
 				// The WRKOUT pipe from the worker to all modules or main
 				var teeOut:IPipeFitting = new TeeSplit();
@@ -39,7 +38,6 @@ package app.common.worker
 				junction.registerPipe( PipeAwareModule.WRKOUT, Junction.OUTPUT, teeOut );
 			}
 
-//			trace("> WorkerJunction : PipeAwareModule.WRKIN =", junction.hasPipe(PipeAwareModule.WRKIN))
 			if(!junction.hasPipe(PipeAwareModule.WRKIN)) {
 				// The WRKIN pipe to the worker from all modules
 				const teeMerge		: TeeMerge = new TeeMerge();

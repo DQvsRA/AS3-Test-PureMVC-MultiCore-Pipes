@@ -1,14 +1,14 @@
 package app.main.view.modules
 {
-	import app.modules.CircleMakerModule;
+	import app.modules.CircleButtonModule;
 	import org.puremvc.as3.multicore.interfaces.INotification;
 	import org.puremvc.as3.multicore.patterns.mediator.Mediator;
 	
-	public class CircleMakerModuleMediator extends Mediator
+	public class CircleButtonModuleMediator extends Mediator
 	{
 		public static const NAME:String = 'CircleMakerModuleMediator';
 		
-		public function CircleMakerModuleMediator( viewComponent:CircleMakerModule )
+		public function CircleButtonModuleMediator( viewComponent:CircleButtonModule )
 		{
 			super( viewComponent.getID(), viewComponent);
 		}
@@ -36,9 +36,9 @@ package app.main.view.modules
 			}
 		}
 		
-		private function get circleMakerModule():CircleMakerModule
+		private function get circleMakerModule():CircleButtonModule
 		{
-			return viewComponent as CircleMakerModule;
+			return viewComponent as CircleButtonModule;
 		}
 		
 	

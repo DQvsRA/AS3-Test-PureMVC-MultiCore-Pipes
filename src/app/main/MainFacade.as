@@ -1,6 +1,6 @@
 package app.main
 {
-	import app.main.controller.CircleMakerModuleCreateCommand;
+	import app.main.controller.CreateCircleButtonModuleCommand;
 	import app.main.controller.MainStartupCommand;
 	import org.puremvc.as3.multicore.patterns.facade.Facade;
 
@@ -49,7 +49,7 @@ package app.main
         {
             super.initializeController();            
             registerCommand( STARTUP, MainStartupCommand );
-            registerCommand( CREATE_MODULE_CIRCLE_MAKER, CircleMakerModuleCreateCommand );
+            registerCommand( CREATE_MODULE_CIRCLE_MAKER, CreateCircleButtonModuleCommand );
         }
         
         /**

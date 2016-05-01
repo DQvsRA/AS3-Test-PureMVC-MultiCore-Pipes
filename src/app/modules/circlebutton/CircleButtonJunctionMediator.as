@@ -9,7 +9,7 @@ package app.modules.circlebutton
 	import app.common.worker.WorkerRequestMessage;
 	import app.common.worker.WorkerResponceMessage;
 	import app.modules.CalculatorModule;
-	import app.modules.CircleMakerModule;
+	import app.modules.CircleButtonModule;
 	import app.common.worker.WorkerModule;
 	import app.modules.circlebutton.CircleButtonFacade;
 	
@@ -62,13 +62,13 @@ package app.modules.circlebutton
 					break;
 				case CircleButtonFacade.EXPORT_CIRLE_BUTTON:
 					trace("\t\tEXPORT_CIRLE_BUTTON:", note.getBody());
-					const circleMakerMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, CircleMakerModule.MESSAGE_TO_MAIN_CIRCLE_MAKER_BUTTON, note.getBody() as DisplayObject );
+					const circleMakerMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, CircleButtonModule.MESSAGE_TO_MAIN_CIRCLE_MAKER_BUTTON, note.getBody() as DisplayObject );
 					junction.sendMessage( PipeAwareModule.STDMAIN, circleMakerMessage );
 					break;
 				
 				case CircleButtonFacade.ASK_FOR_CIRCLE_BUTTON_PARAMERTS:
 					sendNotification(LogMessage.SEND_TO_LOG, "Circle Button request parameters from worker: " + this.multitonKey, LogMessage.LEVELS[LogMessage.INFO]);
-					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( CalculatorModule.CALCULATE_CIRCLE_BUTTON, null, CircleMakerModule.RECIEVE_CIRCLE_BUTTON_PARAMERTS ) );
+					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( CalculatorModule.CALCULATE_CIRCLE_BUTTON, null, CircleButtonModule.RECIEVE_CIRCLE_BUTTON_PARAMERTS ) );
 					break;
 				
 				// And let super handle the rest (ACCEPT_OUTPUT_PIPE)								
@@ -86,7 +86,7 @@ package app.modules.circlebutton
 			if(message is WorkerResponceMessage) {
 				switch(WorkerResponceMessage(message).responce)
 				{
-					case CircleMakerModule.RECIEVE_CIRCLE_BUTTON_PARAMERTS:
+					case CircleButtonModule.RECIEVE_CIRCLE_BUTTON_PARAMERTS:
 					{
 						DisconnectFromWorker();
 						sendNotification(CircleButtonFacade.SETUP_CIRCLE_BUTTON_PARAMETERS, WorkerResponceMessage(message).data);
