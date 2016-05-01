@@ -22,7 +22,7 @@ Every module must have special Junction that holds and register incomming pipes 
 
 > **JunctionMediator is the place from where messages to others modules may be send by using junction.sendMessages(...). So to send back result you need to catch internal notification from module's entities and rework it to special Message (class).**
 
-This messages will also be received only by JunctionMediator of others modules whoes junction have appropriate pipes and tees.
+This messages will also be received only by JunctionMediator of others modules whoes junction have appropriate pipes and tees. **We recommend you to use TeeMerge and TeeSplit.**
 
 For *single connections* Junction must have a simple pipe and for *multiple connection* Junction must have special tees - TeeMerge for input or TeeSplit for output.
 - **TeeMerge** is extend regular Pipe and may connect multiple incoming pipes to themself by using .connectInput(IPipeFitting) method or connect themself to pipe with .connect method (from Pipe).
