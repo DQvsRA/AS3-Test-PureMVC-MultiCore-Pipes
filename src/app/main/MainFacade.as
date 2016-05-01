@@ -1,6 +1,6 @@
 package app.main
 {
-	import app.main.controller.modules.CircleMakerModuleCreateCommand;
+	import app.main.controller.CircleMakerModuleCreateCommand;
 	import app.main.controller.MainStartupCommand;
 	import org.puremvc.as3.multicore.patterns.facade.Facade;
 
@@ -14,7 +14,6 @@ package app.main
 		
 		static public const CONNECT_MODULE_TO_MAIN		:String = "connectModuleToMain";
 		static public const CONNECT_MODULE_TO_LOGGER	:String = "connectModuleToLogger";
-		static public const CONNECT_MODULE_TO_WORKER	:String = "connectModuleToWorker";
 		
 		static public const CONNECT_MAIN_TO_LOGGER		:String = "connectMainToLogger";
 		static public const CONNECT_MAIN_TO_WORKER		:String = "connectMainToWorker";

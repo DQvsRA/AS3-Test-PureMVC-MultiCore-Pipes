@@ -1,5 +1,5 @@
 
-package app.modules
+package app.common.worker
 {
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -10,19 +10,21 @@ package app.modules
 	import flash.utils.ByteArray;
 	import flash.utils.getQualifiedClassName;
 	
-	import app.modules.worker.WorkerFacade;
-	
 	import nest.services.worker.events.WorkerEvent;
 	import nest.services.worker.process.WorkerTask;
 	import nest.services.worker.swf.DynamicSWF;
 	
 	import org.puremvc.as3.multicore.interfaces.IFacade;
-	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeAware;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeFitting;
 	import org.puremvc.as3.multicore.utilities.pipes.plumbing.JunctionMediator;
 	
-	public class WorkerModule extends Sprite implements IPipeAware
+	public class WorkerModule extends Sprite implements IWorkerModule
 	{
+//		static public const TOWRK	:String 		= 'toWorkerTee';	/** Worker output out. */
+//		static public const FROMWRK	:String 		= 'fromWorkerTee';	/** Worker output in. */
+//		static public const WRKIN	:String 		= 'workerIn';		/** Worker input in. */
+//		static public const WRKOUT	:String 		= 'workerOut'; 		/** Worker output out. */
+		
 		static private const 
 			NAME						: String = "worker.module"
 		,	INCOMIMG_MESSAGE_CHANNEL	: String = "incomimgMessageChannel"
@@ -30,15 +32,10 @@ package app.modules
 		,	SHARE_DATA_PIPE				: String = "shareDataPipe"
 		;
 		
+		static public const CONNECT_MODULE_TO_WORKER	: String = "connectModuleToWorker";
 		static public const DICONNECT_OUTPUT_PIPE		: String = "diconnectOutputPipe";
 		static public const DICONNECT_INPUT_PIPE		: String = "diconnectInputPipe";
 		
-		static public const CALCULATE_CIRCLE_BUTTON		: String = "calculateCircleSize";
-		static public const CALCULATE_MAIN_COLOR		: String = "calculateMainColor";
-		static public const CALCULATE_LOG_SIZE			: String = "calculateLogSize";
-		
-		static public const MESSAGE_TO_MAIN_SET_COLOR 	: String = "messageToMainSetColor";
-
 		public var 
 			isReady 		: Boolean
 		,	isMaster 		: Boolean
@@ -66,14 +63,10 @@ package app.modules
 		 */
 		public function WorkerModule(bytes:ByteArray = null)
 		{
-			this.facade = WorkerFacade.getInstance( moduleID );
-			
 			isSupported = Worker.isSupported;
 			isMaster = Worker.current.isPrimordial;
 			isReady = false;
 			isBusy = false;
-			
-			WorkerFacade(facade).isMaster = isMaster;
 			
 			if (isSupported) 
 			{
@@ -110,10 +103,10 @@ package app.modules
 					_shareable.shareable = true;
 					
 					// Worker don't need to wait, it's start immediately
-					Starting();
+					start();
 				}
 			} else {
-				Starting();
+				start();
 				ready();
 			}
 		}
@@ -124,7 +117,6 @@ package app.modules
 		//==================================================================================================	
 		public function send(task:WorkerTask):void {
 		//==================================================================================================	
-//			trace("> WorkerModule -> SEND MESSAGE: M =", isMaster, task.id);
 			if(isBusy) {
 				_tasksQueue.push(task);
 			} else {
@@ -144,10 +136,10 @@ package app.modules
 		public function completeTask():void {
 		//==================================================================================================	
 			isBusy = false;
-//			trace("\n> COMPLETE TASK => TASK QUEUE:", isMaster, _tasksQueue.length);
+			trace("\n> COMPLETE TASK => TASK QUEUE:", isMaster, _tasksQueue.length);
 			if(_tasksQueue.length) {
 				const task:WorkerTask = _tasksQueue.shift();
-//				trace("\t\t : TASK:", JSON.stringify(task));
+				trace("\t\t : TASK:", JSON.stringify(task));
 				this.send(task);
 			}
 		}
@@ -185,18 +177,18 @@ package app.modules
 		}
 		
 		//==================================================================================================	
-		private function Starting():void {
+		public function start():void {
 		//==================================================================================================	
-//			trace("> WorkerModule -> Starting: M =", isMaster);
-			WorkerFacade(facade).startup( this );
+			trace("> WorkerModule -> Starting: M =", isMaster);
+			throw new Error("Method start in class that extend WorkerModule must be overwritten");
 		}
 		
 		//==================================================================================================
 		private function MasterHanlder_WorkerState(e:Event):void {
 		//==================================================================================================
-//			trace("> WorkerModule -> MasterHanlder_WorkerState:", e.currentTarget.state == WorkerState.RUNNING, isReady);
+			trace("> WorkerModule -> MasterHanlder_WorkerState:", e.currentTarget.state == WorkerState.RUNNING, isReady);
 			switch(e.currentTarget.state) {
-				case WorkerState.RUNNING: Starting(); break;
+				case WorkerState.RUNNING: start(); break;
 				case WorkerState.NEW: break;				
 				case WorkerState.TERMINATED: break;					
 			}
@@ -209,8 +201,8 @@ package app.modules
 		protected var facade:IFacade;
 		
 		public function getID():String { return moduleID; }
-		private static function getNextID():String { return NAME + "." + serial++; }
+		public static function getNextID():String { return NAME + "." + serial++; }
 		private static var serial:Number = 0;
-		private const moduleID:String = WorkerModule.getNextID();
+		protected const moduleID:String = WorkerModule.getNextID();
 	}
 }

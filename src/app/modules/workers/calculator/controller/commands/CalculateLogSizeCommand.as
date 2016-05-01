@@ -1,6 +1,6 @@
-package app.modules.worker.controller.commands
+package app.modules.workers.calculator.controller.commands
 {
-	import app.modules.worker.WorkerFacade;
+	import app.modules.workers.calculator.CalculatorFacade;
 	
 	import org.puremvc.as3.multicore.interfaces.ICommand;
 	import org.puremvc.as3.multicore.interfaces.INotification;
@@ -12,7 +12,7 @@ package app.modules.worker.controller.commands
 			var logFontSize:uint = 12;
 			const responce:String = note.getType();
 //			trace("CalculateLogSizeCommand", responce);
-			sendNotification(WorkerFacade.SEND_RESULT_LOG_SIZE, logFontSize, responce);
+			sendNotification(CalculatorFacade.SEND_RESULT_LOG_SIZE, logFontSize, responce);
 		}
 	}
 }

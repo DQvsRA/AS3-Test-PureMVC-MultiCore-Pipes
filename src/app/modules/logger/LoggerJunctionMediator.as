@@ -10,8 +10,8 @@ package app.modules.logger
 	import app.common.UIQueryMessage;
 	import app.common.worker.WorkerRequestMessage;
 	import app.common.worker.WorkerResponceMessage;
+	import app.modules.CalculatorModule;
 	import app.modules.LoggerModule;
-	import app.modules.WorkerModule;
 	import app.modules.logger.LoggerFacade;
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
@@ -78,7 +78,7 @@ package app.modules.logger
 					trace("\t\t : LoggerFacade.EXPORT_LOG_UI");
 					const loggerTF:TextField = note.getBody() as TextField;
 					const logWindowMessage:UIQueryMessage = new UIQueryMessage( UIQueryMessage.SET, LoggerModule.MESSAGE_TO_MAIN_LOG_UI, loggerTF);
-					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_LOG_SIZE, null, function(result:WorkerResponceMessage):void {
+					junction.sendMessage( PipeAwareModule.TOWRK, new WorkerRequestMessage( CalculatorModule.CALCULATE_LOG_SIZE, null, function(result:WorkerResponceMessage):void {
 						const fontSize:uint = uint(result.data);
 						trace("\t\t : Message from worker received by logger, result =", fontSize);
 						const format:TextFormat = loggerTF.getTextFormat();

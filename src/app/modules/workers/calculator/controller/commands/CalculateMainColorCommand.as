@@ -1,6 +1,6 @@
-package app.modules.worker.controller.commands
+package app.modules.workers.calculator.controller.commands
 {
-	import app.modules.worker.WorkerFacade;
+	import app.modules.workers.calculator.CalculatorFacade;
 	
 	import org.puremvc.as3.multicore.interfaces.ICommand;
 	import org.puremvc.as3.multicore.interfaces.INotification;
@@ -11,7 +11,7 @@ package app.modules.worker.controller.commands
 		override public function execute(note:INotification):void {
 //			trace("CalculateMainColorCommand", note.getType());
 			sendNotification(
-				WorkerFacade.SEND_RESULT_MAIN_COLOR, 
+				CalculatorFacade.SEND_RESULT_MAIN_COLOR, 
 				uint(Math.random()*0xFFFFFF), 
 				note.getType()
 			);

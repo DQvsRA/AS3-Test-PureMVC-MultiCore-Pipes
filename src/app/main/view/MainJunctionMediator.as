@@ -7,9 +7,9 @@ package app.main.view
 	import app.common.worker.WorkerRequestMessage;
 	import app.common.worker.WorkerResponceMessage;
 	import app.main.MainFacade;
+	import app.modules.CalculatorModule;
 	import app.modules.CircleMakerModule;
 	import app.modules.LoggerModule;
-	import app.modules.WorkerModule;
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeAware;
@@ -64,7 +64,7 @@ package app.main.view
 			{
 				switch ( WorkerResponceMessage(message).responce ) 
 				{
-					case WorkerModule.MESSAGE_TO_MAIN_SET_COLOR:
+					case CalculatorModule.MESSAGE_TO_MAIN_SET_COLOR:
 					{	
 						const color:uint = uint(WorkerResponceMessage(message).data);
 						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
@@ -106,8 +106,8 @@ package app.main.view
 				case MainFacade.WORKER_GET_MAIN_COLOR: 
 				{
 					trace("\t\t : MainFacade.WORKER_GET_MAIN_COLOR")
-//					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, WorkerModule.MESSAGE_TO_MAIN_SET_COLOR	));
-					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( WorkerModule.CALCULATE_MAIN_COLOR, null, function(data:WorkerResponceMessage):void{
+//					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( CalculatorModule.CALCULATE_MAIN_COLOR, null, WorkerModule.MESSAGE_TO_MAIN_SET_COLOR	));
+					junction.sendMessage(PipeAwareModule.TOWRK, new WorkerRequestMessage( CalculatorModule.CALCULATE_MAIN_COLOR, null, function(data:WorkerResponceMessage):void{
 						const color:uint = uint(data.data);
 						sendNotification(MainFacade.APPLY_MAIN_COLOR, color )
 						junction.sendMessage( PipeAwareModule.STDLOG, new LogMessage( 0, multitonKey , "Color received by main: " + color) );

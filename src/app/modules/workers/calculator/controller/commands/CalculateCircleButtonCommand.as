@@ -3,9 +3,9 @@
  * @author Vladimir Minkin
  */
 
-package app.modules.worker.controller.commands 
+package app.modules.workers.calculator.controller.commands 
 {
-	import app.modules.worker.WorkerFacade;
+	import app.modules.workers.calculator.CalculatorFacade;
 	
 	import org.puremvc.as3.multicore.interfaces.ICommand;
 	import org.puremvc.as3.multicore.interfaces.INotification;
@@ -22,7 +22,7 @@ package app.modules.worker.controller.commands
 				overColor 	: Math.random()*0xffffff, 
 				downColor 	: Math.random()*0xffffff
 			};
-			sendNotification(WorkerFacade.SEND_RESULT_CIRCLE_BUTTON, outputParameters, note.getType());
+			sendNotification(CalculatorFacade.SEND_RESULT_CIRCLE_BUTTON, outputParameters, note.getType());
 		}
 	}
 }

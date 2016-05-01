@@ -5,9 +5,9 @@ package app.main.controller
 	import app.main.MainFacade;
 	import app.main.view.MainJunctionMediator;
 	import app.main.view.MainMediator;
+	import app.main.view.modules.CalculatorModuleMediator;
 	import app.main.view.modules.LoggerModuleMediator;
-	import app.main.view.modules.WorkerModuleMediator;
-	import app.modules.WorkerModule;
+	import app.modules.CalculatorModule;
 	
 	import nest.services.worker.events.WorkerEvent;
 	
@@ -23,16 +23,16 @@ package app.main.controller
 			
 			const app:Main = note.getBody() as Main;
 			
-			const workerModule:WorkerModule = new WorkerModule( app.loaderInfo.bytes );
+			const calculatorWorkerModule:CalculatorModule = new CalculatorModule( app.loaderInfo.bytes );
 			
-			facade.registerMediator( new WorkerModuleMediator(workerModule) );
+			facade.registerMediator( new CalculatorModuleMediator(calculatorWorkerModule) );
 			// Create and Register the Application and its Mediator
 			facade.registerMediator( new MainMediator(app) );
 			
-			trace("> MainStartupCommand : workerModule.isSupported", workerModule.isSupported)
+			trace("> MainStartupCommand : workerModule.isSupported", calculatorWorkerModule.isSupported)
 			
-			if (workerModule.isSupported) 
-				workerModule.addEventListener(WorkerEvent.READY, ContinueInitialize);
+			if (calculatorWorkerModule.isSupported) 
+				calculatorWorkerModule.addEventListener(WorkerEvent.READY, ContinueInitialize);
 			else ContinueInitialize();
 		}
 		

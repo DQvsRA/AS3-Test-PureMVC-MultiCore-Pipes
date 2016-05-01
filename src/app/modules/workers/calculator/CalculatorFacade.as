@@ -3,17 +3,17 @@
  * @author Vladimir Minkin
  */
 	
-package app.modules.worker 
+package app.modules.workers.calculator 
 {
-	import app.modules.worker.controller.WorkerStartupCommand;
+	import app.modules.workers.calculator.controller.CalculatorStartupCommand;
 	
 	import org.puremvc.as3.multicore.interfaces.IFacade;
 	import org.puremvc.as3.multicore.patterns.facade.Facade;
 
-	public class WorkerFacade extends Facade implements IFacade 
+	public class CalculatorFacade extends Facade implements IFacade 
 	{
 		// Notification name constants
-		static public const STARTUP			: String = "startup";
+		static public const STARTUP						: String = "startup";
 		
 		static public const CONNECT_MODULE_TO_WORKER	: String = "connectModuleToWorker";
 		static public const SEND_RESULT_MAIN_COLOR		: String = "sendResultToStageColor";
@@ -24,23 +24,21 @@ package app.modules.worker
 		static public const CMD_CALCULATE_CIRCLE_BUTTON	: String = "commandCalculateCircleButton";
 		static public const CMD_CALCULATE_LOG_SIZE		: String = "commandCalculateLogSize";
 		
-		public var isMaster:Boolean;
-		
-		public function WorkerFacade( key:String )
+		public function CalculatorFacade( key:String )
         {
             super(key);
         }
 		
-		public static function getInstance(key:String):WorkerFacade 
+		public static function getInstance(key:String):CalculatorFacade 
 		{
-			if ( instanceMap[ key ] == null ) instanceMap[ key ]  = new WorkerFacade( key );
-            return instanceMap[ key ] as WorkerFacade;
+			if ( instanceMap[ key ] == null ) instanceMap[ key ]  = new CalculatorFacade( key );
+            return instanceMap[ key ] as CalculatorFacade;
 		}
 		
 		override protected function initializeController():void 
 		{
 			super.initializeController();
-			registerCommand(STARTUP, WorkerStartupCommand);
+			registerCommand(STARTUP, CalculatorStartupCommand);
 		}
 		
 		public function startup( module:Object ):void 

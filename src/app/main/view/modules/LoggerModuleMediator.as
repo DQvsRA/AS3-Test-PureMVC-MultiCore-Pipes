@@ -8,6 +8,7 @@ package app.main.view.modules
 	import app.common.PipeAwareModule;
 	import app.main.MainFacade;
 	import app.modules.LoggerModule;
+	import app.common.worker.WorkerModule;
 	
 	import org.puremvc.as3.multicore.interfaces.INotification;
 	import org.puremvc.as3.multicore.patterns.mediator.Mediator;
@@ -37,7 +38,7 @@ package app.main.view.modules
 
 		override public function onRegister():void
 		{
-			facade.sendNotification( MainFacade.CONNECT_MODULE_TO_WORKER, logger );
+			facade.sendNotification( WorkerModule.CONNECT_MODULE_TO_WORKER, logger );
 		}
 		
 		override public function listNotificationInterests():Array

@@ -1,8 +1,3 @@
-/*
- PureMVC AS3 MultiCore Demo – Flex PipeWorks 
- Copyright (c) 2008 Cliff Hall <cliff.hall@puremvc.org>
- Your reuse is governed by the Creative Commons Attribution 3.0 License
- */
 package app.modules.logger.model
 {
 	import app.common.LogMessage;

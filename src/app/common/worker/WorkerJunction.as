@@ -8,7 +8,6 @@ package app.common.worker
 	import flash.utils.getTimer;
 	
 	import app.common.PipeAwareModule;
-	import app.modules.WorkerModule;
 	
 	import nest.services.worker.process.WorkerTask;
 	
@@ -144,7 +143,7 @@ package app.common.worker
 		public function filter_ApplyMessageResponce(message:WorkerResponceMessage, params:Object = null):IPipeMessage {
 			trace("\n> filter_ApplyMessageResponce", JSON.stringify(message));
 			const responceMsgID:String = message.responce;
-			const msgResponce:MessageResponce = _responces[responceMsgID];
+			const msgResponce:WorkerMessageResponce = _responces[responceMsgID];
 			
 			if(msgResponce) {
 				const responce:* = msgResponce.responce;
@@ -170,7 +169,7 @@ package app.common.worker
 			trace("\n> filter_KeepMessageResponce", message);
 			const responceMsgID:String = message.getUID();
 
-			_responces[responceMsgID] = new MessageResponce(message.responce, message.getPipeID());
+			_responces[responceMsgID] = new WorkerMessageResponce(message.responce, message.getPipeID());
 			message.responce = responceMsgID;
 			
 			return message;
