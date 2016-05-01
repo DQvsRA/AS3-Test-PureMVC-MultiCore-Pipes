@@ -38,13 +38,14 @@ Junction is registering this pipes with special names (or "channel") and appropr
 
 Then the rest of the application is initialized and we are registering others modules, for example LoggerModuleMediator and MainJunctionMediator.
 
-**_MainJunctionMediator_** is registering two input pipes - STDIN for standart input from any modules and separated "channel" for listening messages from worker module FROMWRK. Also it can send output messages to STDLOG, TOWRK and standart STDOUT for any modules who has same input "channel". When it has all the neccessary pipes and tees then it connects themself to WorkerModule and LoggerModule with: 
-*sendNotification(MainFacade.CONNECT_MAIN_TO_LOGGER, junction );*
-*sendNotification(MainFacade.CONNECT_MAIN_TO_WORKER, junction );*
+**_MainJunctionMediator_** is registering two input pipes - STDIN for standart input from any modules and separated "channel" for listening messages from worker module FROMWRK. Also it can send output messages to STDLOG, TOWRK and standart STDOUT for any modules who has same input "channel". When it has all the neccessary pipes and tees then it connects themself to WorkerModule and LoggerModule with:
+>*sendNotification( MainFacade.CONNECT_MAIN_TO_LOGGER, junction );
+sendNotification( MainFacade.CONNECT_MAIN_TO_WORKER, junction );*
+
 Which is handled by WorkerModuleMediator (CalculatorModuleMediator) and LoggerModuleMediator appropriate.
 After it all be done and Main is ready for action it send two notifications that will be rewriten to Messages inside MainJunctionMediator who is sending these messages to the modules for processing:
-*facade.sendNotification( MainFacade.GET_MODULE_LOGGER );*
-*facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );*
+>*facade.sendNotification( MainFacade.GET_MODULE_LOGGER );
+facade.sendNotification( MainFacade.WORKER_GET_MAIN_COLOR );*
 
 LoggerJunctionMediator is registering two input pipes - one TeeMerge for regular messages from any modules (STDIN "channel") and another TeeMerge for messages from worker (FROMWRK "channel")
 
