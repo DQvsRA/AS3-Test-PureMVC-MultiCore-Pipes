@@ -19,6 +19,7 @@ The main core holds every module by registering special module mediators. Each m
 
 Every module must have special Junction that holds and register incomming pipes and tees, and also JunctionMediator which receives and processes notifications about pipe connections incoming from PipeAwareModule (who are sent from another modules mediators registered at main module). 
 > **JunctionMediator is a entry point for incoming messages from others modules, this is a place where messages must be retranslated into internal notifications to be processed by that module.**
+
 > **JunctionMediator is the place from where messages to others modules may be send by using junction.sendMessages(...). So to send back result you need to catch internal notification from module's entities and rework it to special Message (class).**
 
 It starting with MainStartupCommand. First worker is being initialized and we are waiting for WorkerEvent.READY event, it fires any way if worker is supported or not. Then the rest of application is initialized.
