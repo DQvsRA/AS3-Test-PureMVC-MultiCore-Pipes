@@ -20,50 +20,45 @@ package app.common.worker
 	
 	public class WorkerModule extends Sprite implements IWorkerModule
 	{
-//		static public const TOWRK	:String 		= 'toWorkerTee';	/** Worker output out. */
-//		static public const FROMWRK	:String 		= 'fromWorkerTee';	/** Worker output in. */
-//		static public const WRKIN	:String 		= 'workerIn';		/** Worker input in. */
-//		static public const WRKOUT	:String 		= 'workerOut'; 		/** Worker output out. */
-		
 		static private const 
-			NAME						: String = "worker.module"
+			WORKER_MODULE_NAME			: String = "worker.module"
 		,	INCOMIMG_MESSAGE_CHANNEL	: String = "incomimgMessageChannel"
 		,	OUTGOING_MESSAGE_CHANNEL	: String = "outgoingMessageChannel"
 		,	SHARE_DATA_PIPE				: String = "shareDataPipe"
 		;
 		
-		static public const CONNECT_MODULE_TO_WORKER	: String = "connectModuleToWorker";
-		static public const DICONNECT_OUTPUT_PIPE		: String = "diconnectOutputPipe";
-		static public const DICONNECT_INPUT_PIPE		: String = "diconnectInputPipe";
-		
-		public var 
-			isReady 		: Boolean
-		,	isMaster 		: Boolean
-		,	isSupported		: Boolean
-		,	isBusy			: Boolean
+		static public const 
+			CONNECT_MODULE_TO_WORKER	: String = "connectModuleToWorker"
+		,	DICONNECT_OUTPUT_PIPE		: String = "diconnectOutputPipe"
+		,	DICONNECT_INPUT_PIPE		: String = "diconnectInputPipe"
 		;
 		
 		public var 
 			incomingMessageChannel	: MessageChannel
 		,	outgoingMessageChannel	: MessageChannel
+		
+		,	isSupported		: Boolean
+		,	isMaster 		: Boolean
+		,	isReady 		: Boolean
+		,	isBusy			: Boolean
 		;
 		
 		private var 
 			_worker  	: Worker
 		,	_shareable	: ByteArray
 		;
+		
+		protected var facade:IFacade;
 			
-		private const 
-			_tasksQueue:Vector.<WorkerTask> = new Vector.<WorkerTask>()
-		;
+		private const _tasksQueue:Vector.<WorkerTask> = new Vector.<WorkerTask>();
 		
 		/**
 		 * This object is the part of Master as well as the worker
 		 * It's a facade holder - entry point for worker application (like Main)
 		 */
-		public function WorkerModule(bytes:ByteArray = null)
+		public function WorkerModule(bytes:ByteArray = null, useWorker:Boolean = true)
 		{
-			isSupported = Worker.isSupported;
+			isSupported = Worker.isSupported && useWorker;
 			isMaster = Worker.current.isPrimordial;
 			isReady = false;
 			isBusy = false;
@@ -75,7 +70,13 @@ package app.common.worker
 					const swf 		: ByteArray = DynamicSWF.fromClass(className, bytes);
 					
 					_worker = WorkerDomain.current.createWorker(swf, false);
-					_worker.addEventListener(Event.WORKER_STATE, MasterHanlder_WorkerState, false, 0, true); 
+					_worker.addEventListener(Event.WORKER_STATE, function(e:Event):void {
+						switch(e.currentTarget.state) {
+							case WorkerState.RUNNING: start(); break;
+							case WorkerState.NEW: break;				
+							case WorkerState.TERMINATED: break;					
+						}
+					}, false, 0, true);
 					
 					incomingMessageChannel = Worker.current.createMessageChannel(_worker);
 					outgoingMessageChannel = _worker.createMessageChannel(Worker.current);
@@ -136,10 +137,10 @@ package app.common.worker
 		public function completeTask():void {
 		//==================================================================================================	
 			isBusy = false;
-			trace("\n> COMPLETE TASK => TASK QUEUE:", isMaster, _tasksQueue.length);
+//			trace("\n> COMPLETE TASK => TASK QUEUE:", isMaster, _tasksQueue.length);
 			if(_tasksQueue.length) {
 				const task:WorkerTask = _tasksQueue.shift();
-				trace("\t\t : TASK:", JSON.stringify(task));
+//				trace("\t\t : TASK:", JSON.stringify(task));
 				this.send(task);
 			}
 		}
@@ -179,29 +180,17 @@ package app.common.worker
 		//==================================================================================================	
 		public function start():void {
 		//==================================================================================================	
-			trace("> WorkerModule -> Starting: M =", isMaster);
+//			trace("> WorkerModule -> Starting: M =", isMaster);
 			throw new Error("Method start in class that extend WorkerModule must be overwritten");
 		}
-		
-		//==================================================================================================
-		private function MasterHanlder_WorkerState(e:Event):void {
-		//==================================================================================================
-			trace("> WorkerModule -> MasterHanlder_WorkerState:", e.currentTarget.state == WorkerState.RUNNING, isReady);
-			switch(e.currentTarget.state) {
-				case WorkerState.RUNNING: start(); break;
-				case WorkerState.NEW: break;				
-				case WorkerState.TERMINATED: break;					
-			}
-		}	
 		
 		public function acceptInputPipe(name:String, pipe:IPipeFitting):void 
 		{ facade.sendNotification( JunctionMediator.ACCEPT_INPUT_PIPE, pipe, name ); }
 		public function acceptOutputPipe(name:String, pipe:IPipeFitting):void 
 		{ facade.sendNotification( JunctionMediator.ACCEPT_OUTPUT_PIPE, pipe, name ); }
-		protected var facade:IFacade;
 		
 		public function getID():String { return moduleID; }
-		public static function getNextID():String { return NAME + "." + serial++; }
+		public static function getNextID():String { return WORKER_MODULE_NAME + "." + serial++; }
 		private static var serial:Number = 0;
 		protected const moduleID:String = WorkerModule.getNextID();
 	}

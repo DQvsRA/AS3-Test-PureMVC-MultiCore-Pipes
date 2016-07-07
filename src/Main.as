@@ -1,9 +1,10 @@
 package
 {
-	import app.main.MainFacade;
 	import flash.display.Graphics;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	
+	import app.main.MainFacade;
 	
 	/**
 	 * ...
@@ -24,7 +25,7 @@ package
 			// entry point
 			
 			_back = this.graphics;
-			this.changeColor(0xf1f1f1)
+			this.changeColor(0xf1f1f1);
 			
 			stage.frameRate = 60;	
 				

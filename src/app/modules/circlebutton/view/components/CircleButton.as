@@ -21,6 +21,8 @@ package app.modules.circlebutton.view.components
 				downColor : Math.random()*0xffffff
 			})
 			
+//			GraphicsPathCommand.MOVE_TO 
+			
 			useHandCursor  = true;
 		}
 		

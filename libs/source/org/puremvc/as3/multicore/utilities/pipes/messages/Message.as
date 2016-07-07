@@ -1,6 +1,6 @@
 package org.puremvc.as3.multicore.utilities.pipes.messages
 {
-	import mx.utils.UIDUtil;
+	import flash.utils.getTimer;
 	
 	import org.puremvc.as3.multicore.utilities.pipes.interfaces.IPipeMessage;
 
@@ -24,6 +24,8 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 		public static const PRIORITY_MED:int = 5;
 		// Low priority Messages can be sorted to the back of the queue 
 		public static const PRIORITY_LOW:int = 10;
+		
+		static private const timeUUID:uint = new Date().getTime();
 		
 		/**
 		 * Normal Message type.
@@ -51,11 +53,13 @@ package org.puremvc.as3.multicore.utilities.pipes.messages
 		// Constructor
 		public function Message( type:String, header:Object=null, body:Object=null, priority:int=5 )
 		{
+			const currentTime:uint = timeUUID + getTimer();
 			setType( type );
 			setHeader( header );
 			setBody( body );
 			setPriority( priority );
-			uid = UIDUtil.createUID();
+			
+			uid = currentTime.toString(16);
 		}
 		
 		// Get the type of this message
